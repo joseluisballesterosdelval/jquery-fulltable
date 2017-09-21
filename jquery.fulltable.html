@@ -1,0 +1,106 @@
+<html>
+<head>
+	<title>jQuery FullTable Plugin Demonstration</title>
+	<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="jquery.fulltable.js"></script>
+	<link rel="stylesheet" href="jquery.fulltable.css"/>
+	
+	<style type="text/css">
+		table {
+			position:relative;
+			width:525px;
+			margin:4px 0;
+			border-collapse: collapse;
+
+			font-family: tahoma, arial, helvetica !important;
+			font-size: 9pt !important;
+		}
+		table, table th, table td {
+			border: 1px solid black;
+		}
+		table th, table td  {
+			padding:0 2em;
+			white-space:nowrap;
+			text-overflow:ellipsis;
+			overflow:hidden;
+			line-height:22px;
+			height:22px;
+		}
+		a.button {
+			position: relative;
+			display: inline-block;
+			
+			font-family: tahoma, arial, helvetica;
+			font-size: 9pt;
+			font-weight: bold;
+			
+			color: #ffffff;
+			background-color: #AAAAAA;
+			
+			padding: 5px;
+			
+			text-decoration: none;
+			
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			border-radius: 5px;
+		}
+	</style>
+	
+	<script type="text/javascript">
+		$(
+			function() {
+				$("#test-table").FullTable({
+					"fields": {
+						"gender":{
+							"options":[
+								{
+									"title":"Male",
+									"value":"xy"
+								},
+								{
+									"title":"Female",
+									"value":"xx"
+								}
+							],
+							"mandatory":true,
+							"placeholder":"Select one"
+						},
+						"firstname":{
+							"mandatory":true
+						},
+						"lastname":{
+							"mandatory":true
+						}
+					}
+				});
+				$("#test-table-add-row").click(function() {
+					$("#test-table").FullTable("addRow");
+				});
+				$("#test-table-get-value").click(function() {
+					console.log($("#test-table").FullTable("getData"));
+				});
+			}
+		)
+	</script>
+</head>
+<body>
+	<a href="#" class="button" id="test-table-add-row">+ Add row</a>
+	<table class="fulltable fulltable-editable" id="test-table">
+		<thead>
+			<tr>
+				<th fulltable-field-name="firstname">First name</th>
+				<th fulltable-field-name="lastname">Last name</th>
+				<th fulltable-field-name="gender">Gender</th>
+				<th fulltable-field-name="description">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr><td><span>John</span></td><td><span>Smith</span></td><td><span>xy</span></td><td><span>Famous explorer</span></td></tr>
+			<tr><td><span>Peter</span></td><td><span>Pan</span></td><td><span>xy</span></td><td><span>Flyer boy who does not grow</span></td></tr>
+			<tr><td><span>Mary</span></td><td><span>Stevenson</span></td><td><span>xx</span></td><td><span>Unknown woman</span></td></tr>
+		</tbody>
+	</table>
+	<a href="#" class="button" id="test-table-get-value">> Get value</a>
+</body>
+</html>

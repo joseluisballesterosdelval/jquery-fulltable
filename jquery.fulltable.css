@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'jquery.fulltable';
+    src: url('jquery.fulltable.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+table.fulltable > thead th a.fulltable-sort {
+	font-family: 'jquery.fulltable';
+    font-size: 9px;
+    position: relative;
+    left: 6px;
+    top: 0px;
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    cursor: pointer;
+}
+table.fulltable > thead th.fulltable-asc a.fulltable-sort:before {
+	content:"A";
+}
+table.fulltable > thead th.fulltable-desc a.fulltable-sort:before {
+	content:"C";
+}
+table.fulltable > thead th {
+	vertical-align: top;
+	position:relative;
+}
+table.fulltable input, table.fulltable select {
+	position:relative;
+	
+	width:100%!important;
+	
+	font-family: tahoma, arial, helvetica;
+	font-size: 9pt;
+
+	clear: both;
+    float: left;
+    margin: 0.5em 0!important;
+}
+table.fulltable.fulltable-editable th.fulltable-edition-control, table.fulltable.fulltable-editable td.fulltable-edition-control {
+    padding: 0 1em;
+}
+table.fulltable.fulltable-editable input.invalid, table.fulltable.fulltable-editable select.invalid {
+	border: solid 1px #FF3333;
+	background-color:#FFEEEE;
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control {
+	white-space:nowrap;
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control a {
+	font-family:'jquery.fulltable';
+	font-size:16px;
+
+	display: inline-block;
+	width:16px;
+	height:16px;
+	line-height:16px;
+	margin:0.5em;
+	cursor:pointer;
+    text-align:center;
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-edit:before {
+	content:"E";
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-remove:before {
+	content:"F";
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-save:before {
+	content:"G";
+}
+table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-discard:before {
+	content:"H";
+}
+table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-edit, table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-remove {
+	display:none;
+}
+table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-discard {
+	display:none;
+}
