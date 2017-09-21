@@ -367,10 +367,10 @@ if (typeof jQuery === 'undefined') {
 				return this;
 			},
 			'drawBody':function() {
-				$(table).find("tbody tr:not(.fulltable-edition-control)").detach();
+				$(table).find("tbody tr").detach();
 				for (var row in rows) {
 					row = rows[row];
-					if (row["__filtered"] || row["__removed"]) continue;
+					if ((row["__filtered"] && !row["__creating"]) || row["__removed"]) continue;
 					row["__invalidOptionRemoved"] = false;
 					for (var field_name in row) {
 						$(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']").empty();
@@ -395,7 +395,7 @@ if (typeof jQuery === 'undefined') {
 						$(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']").text(text);
 						if (row["__invalidOptionRemoved"]) break;
 					}
-					if (row["__invalidOptionRemoved"]) continue;
+					if (row["__invalidOptionRemoved"] && !row["__creating"]) continue;
 					if ($(row["__dom"]).data("fulltable-editing")) {
 						showRowForm(row);
 					}
@@ -438,6 +438,8 @@ if (typeof jQuery === 'undefined') {
 				var compareFunction = function(field, order) {
 					if (order == null) order = 1;
 					var result = function (a, b) {
+						if (a["__creating"] == true) return 1;
+						if (b["__creating"] == true) return -1;
 						if (a == null || b == null) return 0;
 						var fieldData = options.fields[field];
 						if (fieldData == null) fieldData = {};
