@@ -116,6 +116,7 @@ if (typeof jQuery === 'undefined') {
 				var text = value;
 				var fieldData = options.fields[key];
 				if (fieldData == null) fieldData = {};
+				// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 				if (fieldData.options != null) {
 					text = "";
 					var found = false;
@@ -193,6 +194,7 @@ if (typeof jQuery === 'undefined') {
 				var fieldData = options.fields[field_name];
 				if (fieldData == null) fieldData = {};
 				var input;
+				// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 				if (fieldData.options != null) {
 					input = $("<select>");
 					var optionDom = $("<option>", {
@@ -327,6 +329,7 @@ if (typeof jQuery === 'undefined') {
 						if (fieldData == null) fieldData = {};
 						if (fieldData.filterable == null || fieldData.filterable == true) {
 							var filterFieldElement;
+							// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 							if (fieldData.options != null) {
 								filterFieldElement = $("<select>", {
 									'class':"fulltable-filter"
@@ -336,6 +339,7 @@ if (typeof jQuery === 'undefined') {
 									'value':null
 								});
 								$(filterFieldElement).append($(optionDom));
+								// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 								for (var option in fieldData.options) {
 									option = fieldData.options[option];
 									optionDom = $("<option>", {
@@ -379,6 +383,7 @@ if (typeof jQuery === 'undefined') {
 						var fieldData = options.fields[field_name];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.options != null) {
+							// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 							var found = false;
 							for (var option in fieldData.options) {
 								option = fieldData.options[option];
@@ -419,6 +424,7 @@ if (typeof jQuery === 'undefined') {
 						if ($(row["__dom"]).data("fulltable-editing")) continue;
 						var fieldData = options.fields[field_name];
 						if (fieldData == null) fieldData = {};
+						// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 						if (fieldData.options != null) {
 							filtered = (filtering_value != null && filtering_value != '' && filtered_value != filtering_value);
 						} else {
@@ -443,6 +449,7 @@ if (typeof jQuery === 'undefined') {
 						if (a == null || b == null) return 0;
 						var fieldData = options.fields[field];
 						if (fieldData == null) fieldData = {};
+						// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 						if (fieldData.options != null) {
 							var foundA = false, foundB = false;
 							for (var option in fieldData.options) {
@@ -566,6 +573,7 @@ if (typeof jQuery === 'undefined') {
 					var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
 					var value = $(td).find("input, select").val();
 					var text = value;
+					// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 					if (fieldData.options != null) {
 						text = "";
 						for (var option in fieldData.options) {
@@ -598,6 +606,7 @@ if (typeof jQuery === 'undefined') {
 						var value = row[field_name];
 						var text = value;
 						var fieldData = options.fields[field_name] || {};
+						// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 						if (fieldData.options != null) {
 							text = "";
 							for (var option in fieldData.options) {

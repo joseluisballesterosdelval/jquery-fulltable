@@ -37,6 +37,9 @@ table.fulltable input, table.fulltable select {
     float: left;
     margin: 0.5em 0!important;
 }
+table.fulltable.fulltable-editable th.fulltable-edition-control {
+    display:none;
+}
 table.fulltable.fulltable-editable th.fulltable-edition-control, table.fulltable.fulltable-editable td.fulltable-edition-control {
     padding: 0 1em;
 }
