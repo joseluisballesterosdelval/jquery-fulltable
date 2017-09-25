@@ -32,6 +32,10 @@ if (typeof jQuery === 'undefined') {
 			$(table).data('fulltable-sorting', sorting);
 		}
 
+		var on = function() {
+			methods['on'].apply(this, arguments);
+		};
+		
 		var clean = function() {
 			methods['clean'].apply(this, arguments);
 		};
@@ -196,7 +200,9 @@ if (typeof jQuery === 'undefined') {
 				var input;
 				// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 				if (fieldData.options != null) {
-					input = $("<select>");
+					input = $("<select>", {
+						'disabled':fieldData.disabled
+					});
 					var optionDom = $("<option>", {
 						'disabled':options.mandatory,
 						'text':options.placeholder,
@@ -213,7 +219,8 @@ if (typeof jQuery === 'undefined') {
 					}
 				} else {
 					input = $("<input>", {
-						'type':"text"
+						'type':"text",
+						'disabled':fieldData.disabled
 					});
 				}
 				if (value != null) $(input).val(value);
@@ -232,7 +239,18 @@ if (typeof jQuery === 'undefined') {
             throw new Error('FullTable only works when is applied to table, for now.');
         }
 		
+		var on = {};
+		
 		var methods = {
+			'on':function(eventName, eventHandler) {
+				if (typeof eventName != "string" || typeof eventHandler != "function") return;
+				if (eventName != "on" && methods[eventName] != null) {
+					on[eventName] = function() {
+						console.log("Event fired: " + eventName);
+						eventHandler.apply(this, arguments);
+					};
+				}
+			},
 			'clean':function() {
 				$(table).find(".fulltable-edition-control, .fulltable-sort, .fulltable-filter").remove();
 				$(table).removeClass(function (index, className) {
@@ -246,6 +264,7 @@ if (typeof jQuery === 'undefined') {
 					$(table).removeData(dataKey);
 					$(table).find("*").removeData(dataKey);
 				}
+				if (typeof on.clean == "function") on.clean();
 			},
 			'changeSettings':function(newOptionsPart) {
 				if (typeof newOptionsPart != "object") return this;
@@ -270,6 +289,7 @@ if (typeof jQuery === 'undefined') {
 					options[key] = newOptionsPart[key];
 				}
 				draw();
+				if (typeof on.changeSettings == "function") on.changeSettings(newOptionsPart, options);
 				return this;
 			},
 			'draw':function() {
@@ -368,6 +388,7 @@ if (typeof jQuery === 'undefined') {
 		
 				// Appending of header for edition controls
 				addEditionControl({"__dom":$(table).find("thead tr")}, "head");
+				if (typeof on.drawHeader == "function") on.drawHeader();
 				return this;
 			},
 			'drawBody':function() {
@@ -406,6 +427,7 @@ if (typeof jQuery === 'undefined') {
 					}
 					$(table).find("tbody").append(row["__dom"]);
 				}
+				if (typeof on.drawBody == "function") on.drawBody();
 				return this;
 			},
 			'filter':function() {
@@ -436,6 +458,7 @@ if (typeof jQuery === 'undefined') {
 						}
 					}
 				});
+				if (typeof on.order == "function") on.filter();
 				order();
 				return this;
 			},
@@ -494,6 +517,7 @@ if (typeof jQuery === 'undefined') {
 					else $(head).addClass("fulltable-desc");	
 				}
 				drawBody();
+				if (typeof on.order == "function") on.order();
 				return this;
 			},
 			'addRow':function() {
@@ -518,6 +542,7 @@ if (typeof jQuery === 'undefined') {
 				addEditionControl(row, "body");
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
+				if (typeof on.addRow == "function") on.addRow(row);
 				return this;
 			},
 			'editRow':function(row) {
@@ -525,6 +550,7 @@ if (typeof jQuery === 'undefined') {
 				if (typeof row != "object") return this;
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
+				if (typeof on.editRow == "function") on.editRow(row);
 				return this;
 			},
 			'removeRow':function(row) {
@@ -543,6 +569,7 @@ if (typeof jQuery === 'undefined') {
 					});
 					$(td).append($(input));
 				}
+				if (typeof on.removeRow == "function") on.removeRow(row);
 				return this;
 			},
 			'saveRow':function(row) {
@@ -588,6 +615,7 @@ if (typeof jQuery === 'undefined') {
 					$(td).empty();
 					$(td).text(text);
 				}
+				if (typeof on.saveRow == "function") on.saveRow(row);
 				return this;
 			},
 			'discardRow': function(row) {
@@ -622,6 +650,7 @@ if (typeof jQuery === 'undefined') {
 						$(td).text(text);
 					}
 				}
+				if (typeof on.discardRow == "function") on.discardRow(row);
 				return this;
 			},
 			'getData':function() {
@@ -637,18 +666,21 @@ if (typeof jQuery === 'undefined') {
 						resultRow[field_name] = value;
 					}
 				}
+				if (typeof on.getData == "function") on.getData();
 				return result;
 			},
 			'setData':function(data) {
 				if (!Array.isArray(data)) {
 					return this;
 				}
-				rows.splice(0, rows.length);
+				var oldData = rows.splice(0, rows.length);
+				var newData = data;
 				for (var rowData in data) {
 					rowData = data[rowData];
 					rows.push(drawRow(rowData, null));
 				}
 				drawBody();
+				if (typeof on.setData == "function") on.setData(oldData, newData);
 				return this;
 			}
 		};
@@ -667,7 +699,12 @@ if (typeof jQuery === 'undefined') {
 			"editable":true,
 			"filterable":true,
 			"orderable":true,
-			"fields":{}
+			"fields":{},
+			"on":{
+				"update":function() {
+					
+				}
+			}
 		};
 		
 		var options = $(table).data('options');
