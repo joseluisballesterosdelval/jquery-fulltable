@@ -53,6 +53,7 @@ table.fulltable.fulltable-editable th.fulltable-edition-control {
 }
 table.fulltable.fulltable-editable th.fulltable-edition-control, table.fulltable.fulltable-editable td.fulltable-edition-control {
     padding: 0 1em;
+	width: 70px;
 }
 table.fulltable.fulltable-editable input.invalid, table.fulltable.fulltable-editable select.invalid {
 	border: solid 1px #FF3333;
