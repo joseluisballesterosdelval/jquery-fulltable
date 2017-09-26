@@ -15,22 +15,45 @@ if (typeof jQuery === 'undefined') {
         
 		var table = $(this);
 				
-		var keys = $(table).data('fulltable-keys');
-		var rows = $(table).data('fulltable-rows');
-		var sorting = $(table).data('fulltable-sorting');
-
-		if (keys == null) {
-			keys = [];
-			$(table).data('fulltable-keys', keys);
-		}
-		if (rows == null) {
-			rows = [];
-			$(table).data('fulltable-rows', rows);
-		}
-		if (sorting == null) {
-			sorting = [];
-			$(table).data('fulltable-sorting', sorting);
-		}
+		Object.defineProperty(table, "keys", {
+			get:function() {
+				if ($(table).data('fulltable-keys') == null) $(table).data('fulltable-keys', []);
+				return $(table).data('fulltable-keys');
+			},
+			set:function(val) {
+				$(table).data('fulltable-keys', val);
+			}
+		});
+		
+		Object.defineProperty(table, "rows", {
+			get:function() {
+				if ($(table).data('fulltable-rows') == null) $(table).data('fulltable-rows', []);
+				return $(table).data('fulltable-rows');
+			},
+			set:function(val) {
+				$(table).data('fulltable-rows', val);
+			}
+		});
+		
+		Object.defineProperty(table, "sorting", {
+			get:function() {
+				if ($(table).data('fulltable-sorting') == null) $(table).data('fulltable-sorting', []);
+				return $(table).data('fulltable-sorting');
+			},
+			set:function(val) {
+				$(table).data('fulltable-sorting', val);
+			}
+		});
+		
+		Object.defineProperty(table, "events", {
+			get:function() {
+				if ($(table).data('fulltable-events') == null) $(table).data('fulltable-events', {});
+				return $(table).data('fulltable-events');
+			},
+			set:function(val) {
+				$(table).data('fulltable-events', val);
+			}
+		});
 
 		var on = function() {
 			methods['on'].apply(this, arguments);
@@ -84,6 +107,10 @@ if (typeof jQuery === 'undefined') {
 			methods['discardRow'].apply(this, arguments);
 		};
 		
+		var checkRow = function() {
+			methods['checkRow'].apply(this, arguments);
+		};
+		
 		var getHeaderFromDom = function() {
 			// Init headers and field names.		
 			$(table).find("thead th").each(function(th_index, th) {
@@ -92,7 +119,7 @@ if (typeof jQuery === 'undefined') {
 					field_name = (new Date()).getTime()+""+(Math.floor(Math.random()*1e8));
 					$(th).attr("fulltable-field-name", field_name);
 				}
-				keys[th_index] = field_name;
+				table.keys[th_index] = field_name;
 			});
 		};
 		
@@ -100,8 +127,8 @@ if (typeof jQuery === 'undefined') {
 			if (typeof data != "object") data = null;
 			if (tr == null) {
 				tr = $("<tr/>");
-				for (var key in keys) {
-					key = keys[key];
+				for (var key in table.keys) {
+					key = table.keys[key];
 					var td = $("<td/>");
 					$(td).attr("fulltable-field-name", key);
 					$(tr).append($(td));
@@ -109,7 +136,7 @@ if (typeof jQuery === 'undefined') {
 			}
 			var row = {};
 			$(tr).children("td").each(function(td_index, td) {
-				var key = keys[td_index];
+				var key = table.keys[td_index];
 				if (key != null) $(td).attr("fulltable-field-name", key);
 				var value;
 				if (data == null) {
@@ -139,13 +166,14 @@ if (typeof jQuery === 'undefined') {
 			});
 			row["__dom"] = $(tr);
 			row["__filtered"] = false;
+			addSelectionControl(row, "body");
 			addEditionControl(row, "body");
 			return row;
 		};
 
 		var getBodyFromDom = function() {
 			$(table).find("tbody tr").each(function(tr_index, tr) {
-				rows[tr_index] = drawRow(null, tr);
+				table.rows[tr_index] = drawRow(null, tr);
 			});
 		};
 		
@@ -189,6 +217,32 @@ if (typeof jQuery === 'undefined') {
 			$(tr).append($(edition_control));
 		};
 
+		var addSelectionControl = function(row, type) {
+			if (!options.selectable) return;
+			if (typeof row != "object") return;
+			var tr = row["__dom"];
+			if (!$(tr).is("tr")) return;
+			if ($(tr).find(".fulltable-selection-control").length > 0) return;
+			var selection_control = null;
+			if ($(tr).parent().is("thead") || type == "head") {
+				selection_control = $("<th>", {
+					'class':"fulltable-selection-control"
+				});
+			}
+			if ($(tr).parent().is("tbody") || type == "body") {
+				selection_control = $("<td/>", {
+					'class':"fulltable-selection-control"
+				});
+				selection_control.append($("<input/>", {
+					'type':"checkbox",
+					'value':row["__selected"]
+				}).change(function() {
+					checkRow(row);
+				}));
+			}
+			$(tr).prepend($(selection_control));
+		};
+		
 		var showRowForm = function(row) {
 			for (var field_name in row) {
 				if (field_name.indexOf("__") == 0) continue;
@@ -239,13 +293,11 @@ if (typeof jQuery === 'undefined') {
             throw new Error('FullTable only works when is applied to table, for now.');
         }
 		
-		var on = {};
-		
 		var methods = {
 			'on':function(eventName, eventHandler) {
 				if (typeof eventName != "string" || typeof eventHandler != "function") return;
 				if (eventName != "on" && methods[eventName] != null) {
-					on[eventName] = function() {
+					table.events[eventName] = function() {
 						console.log("Event fired: " + eventName);
 						eventHandler.apply(this, arguments);
 					};
@@ -264,7 +316,7 @@ if (typeof jQuery === 'undefined') {
 					$(table).removeData(dataKey);
 					$(table).find("*").removeData(dataKey);
 				}
-				if (typeof on.clean == "function") on.clean();
+				if (typeof table.events.clean == "function") table.events.clean();
 			},
 			'changeSettings':function(newOptionsPart) {
 				if (typeof newOptionsPart != "object") return this;
@@ -289,7 +341,7 @@ if (typeof jQuery === 'undefined') {
 					options[key] = newOptionsPart[key];
 				}
 				draw();
-				if (typeof on.changeSettings == "function") on.changeSettings(newOptionsPart, options);
+				if (typeof table.events.changeSettings == "function") table.events.changeSettings(newOptionsPart, options);
 				return this;
 			},
 			'draw':function() {
@@ -310,8 +362,8 @@ if (typeof jQuery === 'undefined') {
 						}
 						if (reverse) field_sort = -field_sort;
 						var removing_indexes = [];
-						for (var index in sorting) {
-							var sorting_item = sorting[index];
+						for (var index in table.sorting) {
+							var sorting_item = table.sorting[index];
 							if (sorting_item.name == field_name) {
 								removing_indexes.push(index);
 							}
@@ -319,9 +371,9 @@ if (typeof jQuery === 'undefined') {
 						removing_indexes = removing_indexes.reverse();
 						for (var index in removing_indexes) {
 							index = removing_indexes[index];
-							sorting.splice(index, 1);
+							table.sorting.splice(index, 1);
 						}
-						sorting.push({
+						table.sorting.push({
 							name: field_name,
 							sort: field_sort
 						});
@@ -337,7 +389,7 @@ if (typeof jQuery === 'undefined') {
 							var sortElement = $("<a/>").addClass("fulltable-sort");
 							$(sortElement).click(function(event) {
 								apply_order(true);
-								order(sorting);
+								order(table.sorting);
 							});
 							$(th).append(sortElement);
 						}
@@ -388,13 +440,14 @@ if (typeof jQuery === 'undefined') {
 		
 				// Appending of header for edition controls
 				addEditionControl({"__dom":$(table).find("thead tr")}, "head");
-				if (typeof on.drawHeader == "function") on.drawHeader();
+				addSelectionControl({"__dom":$(table).find("thead tr")}, "head");
+				if (typeof table.events.drawHeader == "function") table.events.drawHeader();
 				return this;
 			},
 			'drawBody':function() {
 				$(table).find("tbody tr").detach();
-				for (var row in rows) {
-					row = rows[row];
+				for (var row in table.rows) {
+					row = table.rows[row];
 					if ((row["__filtered"] && !row["__creating"]) || row["__removed"]) continue;
 					row["__invalidOptionRemoved"] = false;
 					for (var field_name in row) {
@@ -406,18 +459,23 @@ if (typeof jQuery === 'undefined') {
 						if (fieldData.options != null) {
 							// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 							var found = false;
-							for (var option in fieldData.options) {
-								option = fieldData.options[option];
-								if (option.value == value) {
-									found = true;
-									text = option.title;
-									break;
+							if (value == null) {
+								if (!fieldData.mandatory) found = true;
+							} else {
+								for (var option in fieldData.options) {
+									option = fieldData.options[option];
+									if (option.value == value) {
+										found = true;
+										text = option.title;
+										break;
+									}
 								}
 							}
 							row["__invalidOptionRemoved"] = row["__invalidOptionRemoved"] || !found; // If option is not in option list, this restriction must be activated.
 						} else {
 							row["__invalidOptionRemoved"] = row["__invalidOptionRemoved"] || false; // If options has been removed from field settings, this restriction must be also removed.
 						}
+						if (value == null) text = "";
 						$(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']").text(text);
 						if (row["__invalidOptionRemoved"]) break;
 					}
@@ -427,20 +485,20 @@ if (typeof jQuery === 'undefined') {
 					}
 					$(table).find("tbody").append(row["__dom"]);
 				}
-				if (typeof on.drawBody == "function") on.drawBody();
+				if (typeof table.events.drawBody == "function") table.events.drawBody();
 				return this;
 			},
 			'filter':function() {
-				for (var row in rows) {
-					row = rows[row];
+				for (var row in table.rows) {
+					row = table.rows[row];
 					row["__filtered"] = false;
 					$(table).find("tbody").append($(row["__dom"]));
 				}
 				$(table).find("thead th input.fulltable-filter, thead th select.fulltable-filter").each(function (i, e) {
 					var filtering_value = $(e).val();
 					var field_name = $(e).parent("th").attr("fulltable-field-name");
-					for (var row in rows) {
-						row = rows[row];
+					for (var row in table.rows) {
+						row = table.rows[row];
 						var filtered_value = row[field_name]; 
 						var filtered = false;
 						if ($(row["__dom"]).data("fulltable-editing")) continue;
@@ -458,12 +516,12 @@ if (typeof jQuery === 'undefined') {
 						}
 					}
 				});
-				if (typeof on.order == "function") on.filter();
+				if (typeof table.events.order == "function") table.events.filter();
 				order();
 				return this;
 			},
 			'order':function() {
-				var fields = sorting;
+				var fields = table.sorting;
 				var compareFunction = function(field, order) {
 					if (order == null) order = 1;
 					var result = function (a, b) {
@@ -510,14 +568,14 @@ if (typeof jQuery === 'undefined') {
 				if (typeof fields != "object") return this;
 				for (var field in fields) {
 					field = fields[field];
-					rows = rows.sort(compareFunction(field.name, field.sort));
+					table.rows = table.rows.sort(compareFunction(field.name, field.sort));
 					var head = $(table).find("thead th[fulltable-field-name='" + field.name + "']"); // TODO: Improve saving header in all rows by reference.
 					$(head).removeClass("fulltable-asc").removeClass("fulltable-desc");
 					if (field.sort >= 0) $(head).addClass("fulltable-asc");	
 					else $(head).addClass("fulltable-desc");	
 				}
 				drawBody();
-				if (typeof on.order == "function") on.order();
+				if (typeof table.events.order == "function") table.events.order();
 				return this;
 			},
 			'addRow':function() {
@@ -525,13 +583,13 @@ if (typeof jQuery === 'undefined') {
 				if ($(table).data("fulltable-creating")) return this;
 				$(table).data("fulltable-creating", true);
 				var row = {};
-				var row_index = rows.length;
-				rows[row_index] = row;
+				var row_index = table.rows.length;
+				table.rows[row_index] = row;
 				row["__creating"] = true;
 				row["__dom"] = $("<tr/>");
 				row["__filtering"] = false; 
-				for (var field_name in keys) {
-					field_name = keys[field_name];
+				for (var field_name in table.keys) {
+					field_name = table.keys[field_name];
 					var td = $("<td/>", {
 						'fulltable-field-name': field_name
 					});
@@ -542,7 +600,7 @@ if (typeof jQuery === 'undefined') {
 				addEditionControl(row, "body");
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
-				if (typeof on.addRow == "function") on.addRow(row);
+				if (typeof table.events.addRow == "function") table.events.addRow(row);
 				return this;
 			},
 			'editRow':function(row) {
@@ -550,7 +608,7 @@ if (typeof jQuery === 'undefined') {
 				if (typeof row != "object") return this;
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
-				if (typeof on.editRow == "function") on.editRow(row);
+				if (typeof table.events.editRow == "function") table.events.editRow(row);
 				return this;
 			},
 			'removeRow':function(row) {
@@ -569,7 +627,7 @@ if (typeof jQuery === 'undefined') {
 					});
 					$(td).append($(input));
 				}
-				if (typeof on.removeRow == "function") on.removeRow(row);
+				if (typeof table.events.removeRow == "function") table.events.removeRow(row);
 				return this;
 			},
 			'saveRow':function(row) {
@@ -615,7 +673,7 @@ if (typeof jQuery === 'undefined') {
 					$(td).empty();
 					$(td).text(text);
 				}
-				if (typeof on.saveRow == "function") on.saveRow(row);
+				if (typeof table.events.saveRow == "function") table.events.saveRow(row);
 				return this;
 			},
 			'discardRow': function(row) {
@@ -650,13 +708,21 @@ if (typeof jQuery === 'undefined') {
 						$(td).text(text);
 					}
 				}
-				if (typeof on.discardRow == "function") on.discardRow(row);
+				if (typeof table.events.discardRow == "function") table.events.discardRow(row);
 				return this;
 			},
-			'getData':function() {
+			'checkRow': function(row) {
+				if (row["__selected"] == null) row["__selected"] = false;
+				row["__selected"] = !row["__selected"]; 
+				if (typeof table.events.checkRow == "function") table.events.checkRow(row);
+			},
+			'getData':function(selected) {
 				var result = [];
-				for (var row in rows) {
-					row = rows[row];
+				for (var row in table.rows) {
+					row = table.rows[row];
+					if (row["__selected"] == null) row["__selected"] = false;
+					if (selected === false && row["__selected"] == true) continue;
+					if (selected === true && row["__selected"] == false) continue;
 					var resultRow = {};
 					if (row["__removed"] == true || row["__invalidOptionRemoved"]) continue;
 					result.push(resultRow);
@@ -666,21 +732,21 @@ if (typeof jQuery === 'undefined') {
 						resultRow[field_name] = value;
 					}
 				}
-				if (typeof on.getData == "function") on.getData();
+				if (typeof table.events.getData == "function") table.events.getData();
 				return result;
 			},
 			'setData':function(data) {
 				if (!Array.isArray(data)) {
 					return this;
 				}
-				var oldData = rows.splice(0, rows.length);
+				var oldData = table.rows.splice(0, table.rows.length);
 				var newData = data;
 				for (var rowData in data) {
 					rowData = data[rowData];
-					rows.push(drawRow(rowData, null));
+					table.rows.push(drawRow(rowData, null));
 				}
 				drawBody();
-				if (typeof on.setData == "function") on.setData(oldData, newData);
+				if (typeof table.events.setData == "function") table.events.setData(oldData, newData);
 				return this;
 			}
 		};
@@ -699,6 +765,7 @@ if (typeof jQuery === 'undefined') {
 			"editable":true,
 			"filterable":true,
 			"orderable":true,
+			"selectable":false,
 			"fields":{},
 			"on":{
 				"update":function() {

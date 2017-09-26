@@ -37,11 +37,23 @@ table.fulltable input, table.fulltable select {
     float: left;
     margin: 0.5em 0!important;
 }
+table.fulltable input[type='checkbox'] {
+	width: 13px!important;
+	height: 13px!important;
+}
+table.fulltable th.fulltable-selection-control {
+	width: 30px;
+}
+table.fulltable th.fulltable-selection-control, table.fulltable td.fulltable-selection-control {
+    padding: 0 1em;
+	width: 30px;
+}
 table.fulltable.fulltable-editable th.fulltable-edition-control {
-    display:none;
+	width: 70px;
 }
 table.fulltable.fulltable-editable th.fulltable-edition-control, table.fulltable.fulltable-editable td.fulltable-edition-control {
     padding: 0 1em;
+	width: 70px;
 }
 table.fulltable.fulltable-editable input.invalid, table.fulltable.fulltable-editable select.invalid {
 	border: solid 1px #FF3333;
