@@ -55,71 +55,81 @@ if (typeof jQuery === 'undefined') {
 			}
 		});
 
+		var types = {
+			"integer":["integer", "number"],
+			"decimal":["decimal", "float", "double"],
+			"string":["string", "literal"]
+		};
+		
 		var on = function() {
-			methods['on'].apply(this, arguments);
+			return methods['on'].apply(this, arguments);
 		};
 		
 		var clean = function() {
-			methods['clean'].apply(this, arguments);
+			return methods['clean'].apply(this, arguments);
 		};
 		
 		var changeSettings = function() {
-			methods['changeSettings'].apply(this, arguments);
+			return methods['changeSettings'].apply(this, arguments);
 		};
 		
 		var drawHeader = function() {
-			methods['drawHeader'].apply(this, arguments);
+			return methods['drawHeader'].apply(this, arguments);
 		};
 		
 		var drawBody = function() {
-			methods['drawBody'].apply(this, arguments);
+			return methods['drawBody'].apply(this, arguments);
 		};
 		
 		var draw = function() {
-			methods['draw'].apply(this, arguments);
+			return methods['draw'].apply(this, arguments);
 		};
 
 		var filter = function() {
-			methods['filter'].apply(this, arguments);
+			return methods['filter'].apply(this, arguments);
 		};
 		
 		var order = function() {
-			methods['order'].apply(this, arguments);
+			return methods['order'].apply(this, arguments);
 		};
-				
+
+		var validateRow = function() {
+			return methods['validateRow'].apply(this, arguments);
+		};
+
 		var addRow = function() {
-			methods['addRow'].apply(this, arguments);
+			return methods['addRow'].apply(this, arguments);
 		};
 
 		var editRow = function() {
-			methods['editRow'].apply(this, arguments);
+			return methods['editRow'].apply(this, arguments);
 		};
 
 		var removeRow = function() {
-			methods['removeRow'].apply(this, arguments);
+			return methods['removeRow'].apply(this, arguments);
 		};
-
+		
 		var saveRow = function() {
-			methods['saveRow'].apply(this, arguments);
+			return methods['saveRow'].apply(this, arguments);
 		};
 
 		var discardRow = function() {
-			methods['discardRow'].apply(this, arguments);
+			return methods['discardRow'].apply(this, arguments);
 		};
 		
 		var checkRow = function() {
-			methods['checkRow'].apply(this, arguments);
+			return methods['checkRow'].apply(this, arguments);
 		};
 		
 		var getHeaderFromDom = function() {
 			// Init headers and field names.		
 			$(table).find("thead th").each(function(th_index, th) {
-				var field_name = $(th).attr("fulltable-field-name");
-				if (field_name == null) {
-					field_name = (new Date()).getTime()+""+(Math.floor(Math.random()*1e8));
-					$(th).attr("fulltable-field-name", field_name);
+				var fieldName = $(th).attr("fulltable-field-name");
+				if (fieldName == null) {
+					fieldName = (new Date()).getTime()+""+(Math.floor(Math.random()*1e8));
+					$(th).attr("fulltable-field-name", fieldName);
 				}
-				table.keys[th_index] = field_name;
+				table.keys[th_index] = fieldName;
 			});
 		};
 		
@@ -244,12 +254,12 @@ if (typeof jQuery === 'undefined') {
 		};
 		
 		var showRowForm = function(row) {
-			for (var field_name in row) {
-				if (field_name.indexOf("__") == 0) continue;
-				var value = row[field_name];
-				var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
+			for (var fieldName in row) {
+				if (fieldName.indexOf("__") == 0) continue;
+				var value = row[fieldName];
+				var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 				$(td).empty();
-				var fieldData = options.fields[field_name];
+				var fieldData = options.fields[fieldName];
 				if (fieldData == null) fieldData = {};
 				var input;
 				// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
@@ -352,19 +362,19 @@ if (typeof jQuery === 'undefined') {
 			'drawHeader':function() {
 				// Drawing of header
 				$(table).find("thead th:not(.fulltable-edition-control)").each(function(th_index, th) {
-					var field_name = $(th).attr("fulltable-field-name");
+					var fieldName = $(th).attr("fulltable-field-name");
 					var apply_order = function(reverse) {
-						var field_sort = 0;
+						var fieldSort = 0;
 						if ($(th).hasClass("fulltable-asc")) {
-							field_sort = 1;
+							fieldSort = 1;
 						} else if ($(th).hasClass("fulltable-desc")) {
-							field_sort = -1;
+							fieldSort = -1;
 						}
-						if (reverse) field_sort = -field_sort;
+						if (reverse) fieldSort = -fieldSort;
 						var removing_indexes = [];
 						for (var index in table.sorting) {
 							var sorting_item = table.sorting[index];
-							if (sorting_item.name == field_name) {
+							if (sorting_item.name == fieldName) {
 								removing_indexes.push(index);
 							}
 						}
@@ -374,8 +384,8 @@ if (typeof jQuery === 'undefined') {
 							table.sorting.splice(index, 1);
 						}
 						table.sorting.push({
-							name: field_name,
-							sort: field_sort
+							name: fieldName,
+							sort: fieldSort
 						});
 					};
 					apply_order(false);
@@ -383,7 +393,7 @@ if (typeof jQuery === 'undefined') {
 					// Insertion of ordenation button.
 					$(th).children("a.fulltable-sort").remove();
 					if (options.orderable) {
-						var fieldData = options.fields[field_name];
+						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.orderable == null || fieldData.orderable == true) {
 							var sortElement = $("<a/>").addClass("fulltable-sort");
@@ -397,7 +407,7 @@ if (typeof jQuery === 'undefined') {
 					// Insertion of filtering fields.
 					$(th).children("input.fulltable-filter, select.fulltable-filter").remove();
 					if (options.filterable) {
-						var fieldData = options.fields[field_name];
+						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.filterable == null || fieldData.filterable == true) {
 							var filterFieldElement;
@@ -450,11 +460,11 @@ if (typeof jQuery === 'undefined') {
 					row = table.rows[row];
 					if ((row["__filtered"] && !row["__creating"]) || row["__removed"]) continue;
 					row["__invalidOptionRemoved"] = false;
-					for (var field_name in row) {
-						$(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']").empty();
-						var value = row[field_name];
+					for (var fieldName in row) {
+						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").empty();
+						var value = row[fieldName];
 						var text = value;
-						var fieldData = options.fields[field_name];
+						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.options != null) {
 							// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
@@ -476,7 +486,7 @@ if (typeof jQuery === 'undefined') {
 							row["__invalidOptionRemoved"] = row["__invalidOptionRemoved"] || false; // If options has been removed from field settings, this restriction must be also removed.
 						}
 						if (value == null) text = "";
-						$(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']").text(text);
+						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").text(text);
 						if (row["__invalidOptionRemoved"]) break;
 					}
 					if (row["__invalidOptionRemoved"] && !row["__creating"]) continue;
@@ -496,13 +506,13 @@ if (typeof jQuery === 'undefined') {
 				}
 				$(table).find("thead th input.fulltable-filter, thead th select.fulltable-filter").each(function (i, e) {
 					var filtering_value = $(e).val();
-					var field_name = $(e).parent("th").attr("fulltable-field-name");
+					var fieldName = $(e).parent("th").attr("fulltable-field-name");
 					for (var row in table.rows) {
 						row = table.rows[row];
-						var filtered_value = row[field_name]; 
+						var filtered_value = row[fieldName]; 
 						var filtered = false;
 						if ($(row["__dom"]).data("fulltable-editing")) continue;
-						var fieldData = options.fields[field_name];
+						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 						if (fieldData.options != null) {
@@ -578,6 +588,140 @@ if (typeof jQuery === 'undefined') {
 				if (typeof table.events.order == "function") table.events.order();
 				return this;
 			},
+			'validateRow':function(row, writeRow) {
+				if (typeof row != "object") return this;
+				var error = false;
+				var errors = [];
+				var values = {};
+				var texts = {};
+				row["__validated_texts"] = texts;
+				row["__validated_values"] = values;
+				for (var fieldName in row) {
+					var fieldError = false;
+					if (fieldName.indexOf("__") == 0) continue;
+					var fieldData = options.fields[fieldName] || {};
+					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
+					var value = null;
+					var text = null;
+					if ($(td).find("input").length > 0) {
+						value = $(td).find("input").val();
+						text = value;
+					} else if ($(td).find("select").length > 0) {
+						value = $(td).find("select").val();
+					} else {
+						text = $(td).text();
+					}
+					// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
+					if (fieldData.options != null) {
+						var found = false;
+						for (var option in fieldData.options) {
+							option = fieldData.options[option];
+							if (option["value"] == value) {
+								text = option["title"]; 
+								found = true;
+								break;
+							} else {
+								if (text = "") text = null;
+								if (option["value"] == text) {
+									value = option["value"];
+									text = option["title"]; 
+									found = true;
+									break;
+								}
+							}
+						}
+						if (!found) {
+							value = null;
+						}
+					}
+					if (value == "") value = null;
+					
+					// Validations: 
+					if (value == null && fieldData.mandatory) {
+						fieldError = true;
+						if (fieldData.errors != null && fieldData.errors.mandatory != null) {
+							errors.push(fieldData.errors.mandatory);
+						}
+					}
+					if (value != null && fieldData.type != null && types[fieldData.type] != null) {
+						var type = null;
+						for (var typeEntry in types) {
+							var typeNames = types[typeEntry];
+							if (typeNames.indexOf(fieldData.type) >= 0) {
+								type = typeEntry;
+								break;
+							}
+						}
+						switch (type) {
+							case "decimal":
+								if (isNaN(value)) {
+									fieldError = true;
+									if (fieldData.errors != null && fieldData.errors.type != null) {
+										errors.push(fieldData.errors.type);
+										value = null;
+									}
+									break;
+								}
+								value = Number(value);
+								break;
+							case "integer":
+								if (isNaN(value)) {
+									fieldError = true;
+									if (fieldData.errors != null && fieldData.errors.type != null) {
+										errors.push(fieldData.errors.type);
+										value = null;
+									}
+									break;
+								}
+								value = Number(value);
+								if (Math.floor(value) != value) {
+									fieldError = true;
+									if (fieldData.errors != null && fieldData.errors.type != null) {
+										errors.push(fieldData.errors.type);
+										value = null;
+									}
+									break;
+								}
+							break;
+							case "string":
+							default:
+							
+							break;
+						}
+					}
+					if (value != null && typeof fieldData.validator == "function") {
+						if (!(fieldData.validator(value, row, table.rows, table) === true)) {
+							fieldError = true;
+							if (fieldData.errors != null && fieldData.errors.validator != null) {
+								errors.push(fieldData.errors.validator);
+								value = null;
+							}
+						}
+					}
+					
+					if (value == null) text = "";
+					values[fieldName] = value;
+					texts[fieldName] = text;
+					
+					if (writeRow == null) writeRow = false;
+					if (writeRow) {
+						for (var fieldName in values) {
+							if ($(td).find("input, select").length > 0) {
+								$(td).find("input, select").val(value);
+							} else {
+								$(td).empty();
+								$(td).text(text);
+							}
+						}
+					}
+					if (fieldError) {
+						$(td).find("input, select").addClass("invalid");
+						if (typeof table.events.error == "function") table.events.error(errors);
+						error = true;
+					}
+				}
+				return !error;
+			},
 			'addRow':function() {
 				if (!options.editable) return this;
 				if ($(table).data("fulltable-creating")) return this;
@@ -588,13 +732,13 @@ if (typeof jQuery === 'undefined') {
 				row["__creating"] = true;
 				row["__dom"] = $("<tr/>");
 				row["__filtering"] = false; 
-				for (var field_name in table.keys) {
-					field_name = table.keys[field_name];
+				for (var fieldName in table.keys) {
+					fieldName = table.keys[fieldName];
 					var td = $("<td/>", {
-						'fulltable-field-name': field_name
+						'fulltable-field-name': fieldName
 					});
 					$(row["__dom"]).append($(td));
-					row[field_name] = "";
+					row[fieldName] = "";
 				}
 				$(table).children("tbody").append($(row["__dom"]));
 				addEditionControl(row, "body");
@@ -616,10 +760,10 @@ if (typeof jQuery === 'undefined') {
 				if (typeof row != "object") return this;
 				row["__removed"] = true;
 				$(row["__dom"]).detach();
-				for (var field_name in row) {
-					if (field_name.indexOf("__") == 0) continue;
-					var value = row[field_name];
-					var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
+				for (var fieldName in row) {
+					if (fieldName.indexOf("__") == 0) continue;
+					var value = row[fieldName];
+					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 					$(td).empty();
 					var input = $("<input>", {
 						'type':"text",
@@ -633,45 +777,19 @@ if (typeof jQuery === 'undefined') {
 			'saveRow':function(row) {
 				if (!options.editable) return this;
 				if (typeof row != "object") return this;
-				var error = false;
-				for (var field_name in row) {
-					if (field_name.indexOf("__") == 0) continue;
-					var fieldData = options.fields[field_name] || {};
-					if (!fieldData.mandatory) continue;
-					var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
-					var value = $(td).find("input, select").val();
-					if ((value == null || value == '')) {
-						$(td).find("input, select").addClass("invalid");
-						error = true;
-					}
-				}
-				if (error == true) return this;
+				if (!validateRow(row)) return this;
 				$(row["__dom"]).removeClass("fulltable-editing");
 				$(row["__dom"]).data("fulltable-editing", false);
 				if (row["__creating"]) {
 					$(table).data("fulltable-creating", false);
 					row["__creating"] = false;
 				}
-				for (var field_name in row) {
-					if (field_name.indexOf("__") == 0) continue;
-					var fieldData = options.fields[field_name] || {};
-					var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
-					var value = $(td).find("input, select").val();
-					var text = value;
-					// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
-					if (fieldData.options != null) {
-						text = "";
-						for (var option in fieldData.options) {
-							option = fieldData.options[option];
-							if (option["value"] == value) {
-								text = option["title"]; 
-								break;
-							}
-						}
-					}
-					row[field_name] = value;
+				for (var fieldName in row) {
+					if (fieldName.indexOf("__") == 0) continue;
+					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 					$(td).empty();
-					$(td).text(text);
+					$(td).text(row["__validated_texts"][fieldName]);
+					row[fieldName] = row["__validated_values"][fieldName];
 				}
 				if (typeof table.events.saveRow == "function") table.events.saveRow(row);
 				return this;
@@ -687,11 +805,12 @@ if (typeof jQuery === 'undefined') {
 					row["__removed"] = true;
 					$(row["__dom"]).detach();
 				} else {
-					for (var field_name in row) {
-						if (field_name.indexOf("__") == 0) continue;
-						var value = row[field_name];
+					for (var fieldName in row) {
+						if (fieldName.indexOf("__") == 0) continue;
+						var value = row[fieldName];
 						var text = value;
-						var fieldData = options.fields[field_name] || {};
+						if (text == null) text = "";
+						var fieldData = options.fields[fieldName] || {};
 						// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 						if (fieldData.options != null) {
 							text = "";
@@ -703,7 +822,7 @@ if (typeof jQuery === 'undefined') {
 								}
 							}
 						}
-						var td = $(row["__dom"]).find("td[fulltable-field-name='" + field_name + "']");
+						var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 						$(td).empty();
 						$(td).text(text);
 					}
@@ -726,10 +845,10 @@ if (typeof jQuery === 'undefined') {
 					var resultRow = {};
 					if (row["__removed"] == true || row["__invalidOptionRemoved"]) continue;
 					result.push(resultRow);
-					for (var field_name in row) {
-						if (field_name.indexOf("__") == 0) continue;
-						var value = row[field_name];
-						resultRow[field_name] = value;
+					for (var fieldName in row) {
+						if (fieldName.indexOf("__") == 0) continue;
+						var value = row[fieldName];
+						resultRow[fieldName] = value;
 					}
 				}
 				if (typeof table.events.getData == "function") table.events.getData();
@@ -743,10 +862,15 @@ if (typeof jQuery === 'undefined') {
 				var newData = data;
 				for (var rowData in data) {
 					rowData = data[rowData];
-					table.rows.push(drawRow(rowData, null));
+					var row = drawRow(rowData, null);
+					if (!validateRow(row)) continue;
+					table.rows.push();
 				}
 				drawBody();
 				if (typeof table.events.setData == "function") table.events.setData(oldData, newData);
+				return this;
+			},
+			'error': function() {
 				return this;
 			}
 		};

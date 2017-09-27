@@ -65,17 +65,57 @@
 								}
 							],
 							"mandatory":true,
-							"placeholder":"Select one"
+							"placeholder":"Select one",
+							"errors":{
+								"mandatory":"Gender name is mandatory"
+							}
 						},
 						"firstname":{
-							"mandatory":true
+							"mandatory":true,
+							"errors":{
+								"mandatory":"First name is mandatory"
+							}
 						},
 						"lastname":{
-							"mandatory":true
+							"mandatory":true,
+							"errors":{
+								"mandatory":"Last name is mandatory"
+							}
+						},
+						"age":{
+							"type":"integer",
+							"mandatory":false,
+							"validator":function(age) {
+								if (age >= 0) {
+									return true;
+								} else {
+									return false;
+								}
+							},
+							"errors":{
+								"type":"Age must be an integer number",
+								"mandatory":"Age is mandatory",
+								"validator":"Age cannot be negative"
+							}				
+						},
+						"height":{
+							"type":"decimal",
+							"mandatory":false,
+							"validator":function(height) {
+								if ((height > 0.3) && (height <= 2.8)) {
+									return true;
+								} else {
+									return false;
+								}
+							},
+							"errors":{
+								"type":"Height must be a number",
+								"mandatory":"Height is mandatory",
+								"validator":"Height cannot be neither biggest than 2.8 nor lowest than 0.3"
+							}
 						},
 						"description":{
-							"mandatory":false,
-							"disabled":true
+							"mandatory":false
 						}
 					}
 				});
@@ -84,6 +124,12 @@
 				});
 				$("#test-table-get-value").click(function() {
 					console.log($("#test-table").FullTable("getData"));
+				});
+				$("#test-table").FullTable("on", "error", function(errors) {
+					for (var error in errors) {
+						error = errors[error];
+						console.log(error);
+					}
 				});
 			}
 		)
@@ -97,13 +143,15 @@
 				<th fulltable-field-name="firstname">First name</th>
 				<th fulltable-field-name="lastname">Last name</th>
 				<th fulltable-field-name="gender">Gender</th>
+				<th fulltable-field-name="age">Age</th>
+				<th fulltable-field-name="height">Height</th>
 				<th fulltable-field-name="description">Description</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr><td><span>John</span></td><td><span>Smith</span></td><td><span>xy</span></td><td><span>Famous explorer</span></td></tr>
-			<tr><td><span>Peter</span></td><td><span>Pan</span></td><td><span>xy</span></td><td><span>Flyer boy who does not grow</span></td></tr>
-			<tr><td><span>Mary</span></td><td><span>Stevenson</span></td><td><span>xx</span></td><td><span>Unknown woman</span></td></tr>
+			<tr><td><span>John</span></td><td><span>Smith</span></td><td><span>xy</span></td><td><span>23</span></td><td><span>1.72</span></td><td><span>Famous explorer</span></td></tr>
+			<tr><td><span>Peter</span></td><td><span>Pan</span></td><td><span>xy</span></td><td><span>10</span></td><td><span>1.60</span></td><td><span>Flyer boy who does not grow</span></td></tr>
+			<tr><td><span>Mary</span></td><td><span>Stevenson</span></td><td><span>xx</span></td><td><span>35</span></td><td><span>1.69</span></td><td><span>Unknown woman</span></td></tr>
 		</tbody>
 	</table>
 	<a href="#" class="button" id="test-table-get-value">> Get value</a>
