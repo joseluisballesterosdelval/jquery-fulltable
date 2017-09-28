@@ -13,6 +13,10 @@ if (typeof jQuery === 'undefined') {
 
     $.fn.FullTable = function() {
         
+		if (!this.is('table')) {
+            return this;
+        }
+				
 		var table = $(this);
 				
 		Object.defineProperty(table, "keys", {
@@ -120,6 +124,25 @@ if (typeof jQuery === 'undefined') {
 		var checkRow = function() {
 			return methods['checkRow'].apply(this, arguments);
 		};
+		
+		var addSortItem = function(fieldName, fieldSort) {
+			var removing_indexes = [];
+			for (var index in table.sorting) {
+				var sortingItem = table.sorting[index];
+				if (sortingItem.name == fieldName) {
+					removing_indexes.push(index);
+				}
+			}
+			removing_indexes = removing_indexes.reverse();
+			for (var index in removing_indexes) {
+				index = removing_indexes[index];
+				table.sorting.splice(index, 1);
+			}
+			table.sorting.push({
+				name: fieldName,
+				sort: fieldSort
+			});
+		}
 		
 		var getHeaderFromDom = function() {
 			// Init headers and field names.		
@@ -299,10 +322,6 @@ if (typeof jQuery === 'undefined') {
 			$(row["__dom"]).addClass("fulltable-editing");
 		};
 		
-		if (!this.is('table')) {
-            throw new Error('FullTable only works when is applied to table, for now.');
-        }
-		
 		var methods = {
 			'on':function(eventName, eventHandler) {
 				if (typeof eventName != "string" || typeof eventHandler != "function") return;
@@ -361,7 +380,7 @@ if (typeof jQuery === 'undefined') {
 			},
 			'drawHeader':function() {
 				// Drawing of header
-				$(table).find("thead th:not(.fulltable-edition-control)").each(function(th_index, th) {
+				$(table).find("thead th:not(.fulltable-edition-control):not(.fulltable-selection-control)").each(function(th_index, th) {
 					var fieldName = $(th).attr("fulltable-field-name");
 					var apply_order = function(reverse) {
 						var fieldSort = 0;
@@ -371,22 +390,7 @@ if (typeof jQuery === 'undefined') {
 							fieldSort = -1;
 						}
 						if (reverse) fieldSort = -fieldSort;
-						var removing_indexes = [];
-						for (var index in table.sorting) {
-							var sorting_item = table.sorting[index];
-							if (sorting_item.name == fieldName) {
-								removing_indexes.push(index);
-							}
-						}
-						removing_indexes = removing_indexes.reverse();
-						for (var index in removing_indexes) {
-							index = removing_indexes[index];
-							table.sorting.splice(index, 1);
-						}
-						table.sorting.push({
-							name: fieldName,
-							sort: fieldSort
-						});
+						addSortItem(fieldName, fieldSort);	
 					};
 					apply_order(false);
 					
@@ -417,7 +421,7 @@ if (typeof jQuery === 'undefined') {
 									'class':"fulltable-filter"
 								});
 								var optionDom = $("<option>", {
-									'text':options.placeholder,
+									'text':fieldData.options.placeholder,
 									'value':null
 								});
 								$(filterFieldElement).append($(optionDom));
@@ -495,7 +499,7 @@ if (typeof jQuery === 'undefined') {
 					}
 					$(table).find("tbody").append(row["__dom"]);
 				}
-				if (typeof table.events.drawBody == "function") table.events.drawBody();
+				if (typeof table.events.drawBody == "function") table.events.drawBody(table.rows);
 				return this;
 			},
 			'filter':function() {
@@ -530,8 +534,17 @@ if (typeof jQuery === 'undefined') {
 				order();
 				return this;
 			},
-			'order':function() {
+			'order':function(sorting) {
 				var fields = table.sorting;
+				if (Array.isArray(sorting)) {
+					sorting = sorting.reverse();
+					for (var sortingItem in sorting) {
+						sortingItem = sorting[sortingItem];
+						if (sortingItem.name != null && typeof(sortingItem.sort) == "number") {
+							addSortItem(sortingItem.name, sortingItem.sort);
+						}
+					}
+				}
 				var compareFunction = function(field, order) {
 					if (order == null) order = 1;
 					var result = function (a, b) {
@@ -575,7 +588,7 @@ if (typeof jQuery === 'undefined') {
 					};
 					return result;
 				};
-				if (typeof fields != "object") return this;
+				if (!Array.isArray(fields) || fields.length == 0) return this;
 				for (var field in fields) {
 					field = fields[field];
 					table.rows = table.rows.sort(compareFunction(field.name, field.sort));
