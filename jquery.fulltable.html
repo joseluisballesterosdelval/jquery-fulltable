@@ -51,6 +51,7 @@
 		$(
 			function() {
 				$("#test-table").FullTable({
+					"alwaysCreating":true,
 					"selectable":true,
 					"fields": {
 						"gender":{
@@ -64,7 +65,7 @@
 									"value":"xx"
 								}
 							],
-							"mandatory":false,
+							"mandatory":true,
 							"placeholder":"Select one",
 							"errors":{
 								"mandatory":"Gender name is mandatory"
@@ -131,8 +132,9 @@
 						console.log(error);
 					}
 				});
+				$("#test-table").FullTable("draw");
 			}
-		)
+		);
 	</script>
 </head>
 <body>

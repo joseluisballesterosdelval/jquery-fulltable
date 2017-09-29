@@ -755,8 +755,11 @@ if (typeof jQuery === 'undefined') {
 				}
 				$(table).children("tbody").append($(row["__dom"]));
 				addEditionControl(row, "body");
+				addSelectionControl(row, "body");
+				$(row["__dom"]).find("td.fulltable-selection-control input[type='checkbox']").prop("disabled", true);
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
+				$(row["__dom"]).addClass("fulltable-creating");
 				if (typeof table.events.addRow == "function") table.events.addRow(row);
 				return this;
 			},
@@ -766,6 +769,7 @@ if (typeof jQuery === 'undefined') {
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
 				if (typeof table.events.editRow == "function") table.events.editRow(row);
+				if (options.alwaysCreating === true) addRow(); // Here this invocation should not be needed, but it cannot cause problems because method idenpontency.
 				return this;
 			},
 			'removeRow':function(row) {
@@ -785,6 +789,7 @@ if (typeof jQuery === 'undefined') {
 					$(td).append($(input));
 				}
 				if (typeof table.events.removeRow == "function") table.events.removeRow(row);
+				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
 			'saveRow':function(row) {
@@ -795,6 +800,8 @@ if (typeof jQuery === 'undefined') {
 				$(row["__dom"]).data("fulltable-editing", false);
 				if (row["__creating"]) {
 					$(table).data("fulltable-creating", false);
+					$(row["__dom"]).removeClass("fulltable-creating");
+					$(row["__dom"]).find("td.fulltable-selection-control input[type='checkbox']").prop("disabled", false);
 					row["__creating"] = false;
 				}
 				for (var fieldName in row) {
@@ -805,6 +812,7 @@ if (typeof jQuery === 'undefined') {
 					row[fieldName] = row["__validated_values"][fieldName];
 				}
 				if (typeof table.events.saveRow == "function") table.events.saveRow(row);
+				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
 			'discardRow': function(row) {
@@ -841,6 +849,7 @@ if (typeof jQuery === 'undefined') {
 					}
 				}
 				if (typeof table.events.discardRow == "function") table.events.discardRow(row);
+				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
 			'checkRow': function(row) {
@@ -943,6 +952,7 @@ if (typeof jQuery === 'undefined') {
 		drawHeader();
 		getBodyFromDom();
 		drawBody();
+		if (options.alwaysCreating === true) addRow();
 		
 		return this;
     };

@@ -44,6 +44,9 @@ table.fulltable input[type='checkbox'] {
 table.fulltable th.fulltable-selection-control {
 	width: 30px;
 }
+/*table.fulltable tr.fulltable-editing td.fulltable-selection-control input[type='checkbox'] {
+	display:none;
+}*/
 table.fulltable th.fulltable-selection-control, table.fulltable td.fulltable-selection-control {
     padding: 0 1em;
 	width: 30px;
@@ -81,6 +84,9 @@ table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-remo
 }
 table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-save:before {
 	content:"G";
+}
+table.fulltable.fulltable-editable tr.fulltable-creating td.fulltable-edition-control a.fulltable-save:before {
+	content:"I";
 }
 table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-discard:before {
 	content:"H";
