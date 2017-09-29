@@ -729,9 +729,11 @@ if (typeof jQuery === 'undefined') {
 					}
 					if (fieldError) {
 						$(td).find("input, select").addClass("invalid");
-						if (typeof table.events.error == "function") table.events.error(errors);
 						error = true;
 					}
+				}
+				if (error) {
+					if (typeof table.events.error == "function") table.events.error(errors);
 				}
 				return !error;
 			},
