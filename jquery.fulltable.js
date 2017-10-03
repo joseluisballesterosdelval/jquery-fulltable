@@ -656,7 +656,7 @@ if (typeof jQuery === 'undefined') {
 							errors.push(fieldData.errors.mandatory);
 						}
 					}
-					if (value != null && fieldData.type != null && types[fieldData.type] != null) {
+					if (value != null && fieldData.type != null) {
 						var type = null;
 						for (var typeEntry in types) {
 							var typeNames = types[typeEntry];

@@ -67,10 +67,11 @@ table.fulltable.fulltable-editable td.fulltable-edition-control {
 table.fulltable.fulltable-editable td.fulltable-edition-control a {
 	font-family:'jquery.fulltable';
 	font-size:16px;
-
+	position:relative;
 	display: inline-block;
 	width:16px;
 	height:16px;
+	top:1px;
 	line-height:16px;
 	margin:0.5em;
 	cursor:pointer;
