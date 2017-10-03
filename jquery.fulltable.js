@@ -466,6 +466,7 @@ if (typeof jQuery === 'undefined') {
 					row["__invalidOptionRemoved"] = false;
 					for (var fieldName in row) {
 						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").empty();
+						if (row["__creating"] || $(row["__dom"]).data("fulltable-editing")) continue;
 						var value = row[fieldName];
 						var text = value;
 						var fieldData = options.fields[fieldName];
@@ -747,6 +748,7 @@ if (typeof jQuery === 'undefined') {
 				row["__creating"] = true;
 				row["__dom"] = $("<tr/>");
 				row["__filtering"] = false; 
+				row["__invalidOptionRemoved"] = false; 
 				for (var fieldName in table.keys) {
 					fieldName = table.keys[fieldName];
 					var td = $("<td/>", {
@@ -867,7 +869,8 @@ if (typeof jQuery === 'undefined') {
 					if (selected === false && row["__selected"] == true) continue;
 					if (selected === true && row["__selected"] == false) continue;
 					var resultRow = {};
-					if (row["__removed"] == true || row["__invalidOptionRemoved"]) continue;
+					if (row["__creating"] === true) continue;
+					if (row["__removed"] === true || row["__invalidOptionRemoved"] === true) continue;
 					result.push(resultRow);
 					for (var fieldName in row) {
 						if (fieldName.indexOf("__") == 0) continue;
