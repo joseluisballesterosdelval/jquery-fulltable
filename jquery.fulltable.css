@@ -25,6 +25,11 @@ table.fulltable > thead th {
 	vertical-align: top;
 	position:relative;
 }
+table.fulltable span.fulltable-filter {
+	position:relative;
+	display:block;
+}
+
 table.fulltable input, table.fulltable select {
 	position:relative;
 	

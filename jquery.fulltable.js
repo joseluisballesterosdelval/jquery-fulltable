@@ -280,6 +280,7 @@ if (typeof jQuery === 'undefined') {
 			for (var fieldName in row) {
 				if (fieldName.indexOf("__") == 0) continue;
 				var value = row[fieldName];
+				if (value == "") value = null;
 				var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 				$(td).empty();
 				var fieldData = options.fields[fieldName];
@@ -291,8 +292,9 @@ if (typeof jQuery === 'undefined') {
 						'disabled':fieldData.disabled
 					});
 					var optionDom = $("<option>", {
-						'disabled':options.mandatory,
-						'text':options.placeholder,
+						'disabled':fieldData.mandatory,
+						'selected':'selected',
+						'text':fieldData.placeholder,
 						'value':null
 					});
 					$(input).append($(optionDom));
@@ -307,6 +309,7 @@ if (typeof jQuery === 'undefined') {
 				} else {
 					input = $("<input>", {
 						'type':"text",
+						'placeholder':fieldData.placeholder,
 						'disabled':fieldData.disabled
 					});
 				}
@@ -403,13 +406,13 @@ if (typeof jQuery === 'undefined') {
 							var sortElement = $("<a/>").addClass("fulltable-sort");
 							$(sortElement).click(function(event) {
 								apply_order(true);
-								order(table.sorting);
+								order();
 							});
 							$(th).append(sortElement);
 						}
 					}			
 					// Insertion of filtering fields.
-					$(th).children("input.fulltable-filter, select.fulltable-filter").remove();
+					$(th).children("span.fulltable-filter, input.fulltable-filter, select.fulltable-filter").remove();
 					if (options.filterable) {
 						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
@@ -421,7 +424,7 @@ if (typeof jQuery === 'undefined') {
 									'class':"fulltable-filter"
 								});
 								var optionDom = $("<option>", {
-									'text':fieldData.options.placeholder,
+									'text':"", // TODO: Implement a placeholder for combo filter.
 									'value':null
 								});
 								$(filterFieldElement).append($(optionDom));
@@ -440,7 +443,11 @@ if (typeof jQuery === 'undefined') {
 									'type':"text"
 								});
 							}
-							$(th).append(filterFieldElement);
+							var filterSpanWrapper = $("<span>", {
+								'class':"fulltable-filter"
+							});
+							$(th).append(filterSpanWrapper);
+							$(filterSpanWrapper).append(filterFieldElement);
 						}
 					}
 				}).removeClass("fulltable-asc").removeClass("fulltable-desc").addClass("fulltable-asc");
@@ -511,10 +518,10 @@ if (typeof jQuery === 'undefined') {
 				}
 				$(table).find("thead th input.fulltable-filter, thead th select.fulltable-filter").each(function (i, e) {
 					var filtering_value = $(e).val();
-					var fieldName = $(e).parent("th").attr("fulltable-field-name");
+					var fieldName = $(e).parents("th").first().attr("fulltable-field-name");
 					for (var row in table.rows) {
 						row = table.rows[row];
-						var filtered_value = row[fieldName]; 
+						var filtered_value = row[fieldName];
 						var filtered = false;
 						if ($(row["__dom"]).data("fulltable-editing")) continue;
 						var fieldData = options.fields[fieldName];
@@ -523,6 +530,7 @@ if (typeof jQuery === 'undefined') {
 						if (fieldData.options != null) {
 							filtered = (filtering_value != null && filtering_value != '' && filtered_value != filtering_value);
 						} else {
+							if (filtered_value == null) filtered_value = '';
 							filtered = (filtering_value != null && filtering_value != '' && filtered_value.toUpperCase().indexOf(filtering_value.toUpperCase()) < 0);
 						}
 						if (filtered) {
@@ -531,7 +539,7 @@ if (typeof jQuery === 'undefined') {
 						}
 					}
 				});
-				if (typeof table.events.order == "function") table.events.filter();
+				if (typeof table.events.filter == "function") table.events.filter();
 				order();
 				return this;
 			},
@@ -958,6 +966,7 @@ if (typeof jQuery === 'undefined') {
 		getBodyFromDom();
 		drawBody();
 		if (options.alwaysCreating === true) addRow();
+		filter();
 		
 		return this;
     };
