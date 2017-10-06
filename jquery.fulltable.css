@@ -1,6 +1,11 @@
 @font-face {
-    font-family: 'jquery.fulltable';
-    src: url('jquery.fulltable.woff') format('woff');
+    font-family: 'webfontregular';
+    src: url('jquery.fulltable.eot');
+    src: url('jquery.fulltable.eot?#iefix') format('embedded-opentype'),
+         url('jquery.fulltable.woff2') format('woff2'),
+         url('jquery.fulltable.woff') format('woff'),
+         url('jquery.fulltable.ttf') format('truetype'),
+         url('jquery.fulltable.svg#webfontregular') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -100,6 +105,9 @@ table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-disc
 table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-edit, table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-remove {
 	display:none;
 }
-table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-discard {
+table.fulltable.fulltable-editable tr td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr td.fulltable-edition-control a.fulltable-discard {
 	display:none;
+}
+table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-discard {
+	display:inline-block;
 }
