@@ -19,45 +19,37 @@ if (typeof jQuery === 'undefined') {
 				
 		var table = $(this);
 				
-		Object.defineProperty(table, "keys", {
-			get:function() {
-				if ($(table).data('fulltable-keys') == null) $(table).data('fulltable-keys', []);
-				return $(table).data('fulltable-keys');
-			},
-			set:function(val) {
-				$(table).data('fulltable-keys', val);
-			}
-		});
+		table.getKeys = function() {
+			if ($(table).data('fulltable-keys') == null) $(table).data('fulltable-keys', []);
+			return $(table).data('fulltable-keys');
+		};
+		table.setKeys = function(val) {
+			$(table).data('fulltable-keys', val);
+		};
 		
-		Object.defineProperty(table, "rows", {
-			get:function() {
-				if ($(table).data('fulltable-rows') == null) $(table).data('fulltable-rows', []);
-				return $(table).data('fulltable-rows');
-			},
-			set:function(val) {
-				$(table).data('fulltable-rows', val);
-			}
-		});
+		table.getRows = function() {
+			if ($(table).data('fulltable-rows') == null) $(table).data('fulltable-rows', []);
+			return $(table).data('fulltable-rows');
+		};
+		table.setRows = function(val) {
+			$(table).data('fulltable-rows', val);
+		};
 		
-		Object.defineProperty(table, "sorting", {
-			get:function() {
-				if ($(table).data('fulltable-sorting') == null) $(table).data('fulltable-sorting', []);
-				return $(table).data('fulltable-sorting');
-			},
-			set:function(val) {
-				$(table).data('fulltable-sorting', val);
-			}
-		});
+		table.getSorting = function() {
+			if ($(table).data('fulltable-sorting') == null) $(table).data('fulltable-sorting', []);
+			return $(table).data('fulltable-sorting');
+		};
+		table.setSorting = function(val) {
+			$(table).data('fulltable-sorting', val);
+		};
 		
-		Object.defineProperty(table, "events", {
-			get:function() {
-				if ($(table).data('fulltable-events') == null) $(table).data('fulltable-events', {});
-				return $(table).data('fulltable-events');
-			},
-			set:function(val) {
-				$(table).data('fulltable-events', val);
-			}
-		});
+		table.getEvents = function() {
+			if ($(table).data('fulltable-events') == null) $(table).data('fulltable-events', {});
+			return $(table).data('fulltable-events');
+		};
+		table.setEvents = function(val) {
+			$(table).data('fulltable-events', val);
+		};
 
 		var types = {
 			"integer":["integer", "number"],
@@ -127,8 +119,8 @@ if (typeof jQuery === 'undefined') {
 		
 		var addSortItem = function(fieldName, fieldSort) {
 			var removing_indexes = [];
-			for (var index in table.sorting) {
-				var sortingItem = table.sorting[index];
+			for (var index in table.getSorting()) {
+				var sortingItem = table.getSorting()[index];
 				if (sortingItem.name == fieldName) {
 					removing_indexes.push(index);
 				}
@@ -136,9 +128,9 @@ if (typeof jQuery === 'undefined') {
 			removing_indexes = removing_indexes.reverse();
 			for (var index in removing_indexes) {
 				index = removing_indexes[index];
-				table.sorting.splice(index, 1);
+				table.getSorting().splice(index, 1);
 			}
-			table.sorting.push({
+			table.getSorting().push({
 				name: fieldName,
 				sort: fieldSort
 			});
@@ -152,7 +144,7 @@ if (typeof jQuery === 'undefined') {
 					fieldName = (new Date()).getTime()+""+(Math.floor(Math.random()*1e8));
 					$(th).attr("fulltable-field-name", fieldName);
 				}
-				table.keys[th_index] = fieldName;
+				table.getKeys()[th_index] = fieldName;
 			});
 		};
 		
@@ -160,8 +152,9 @@ if (typeof jQuery === 'undefined') {
 			if (typeof data != "object") data = null;
 			if (tr == null) {
 				tr = $("<tr/>");
-				for (var key in table.keys) {
-					key = table.keys[key];
+				for (var key in table.getKeys()) {
+					if (!table.getKeys().hasOwnProperty(key)) continue;
+					key = table.getKeys()[key];
 					var td = $("<td/>");
 					$(td).attr("fulltable-field-name", key);
 					$(tr).append($(td));
@@ -169,7 +162,7 @@ if (typeof jQuery === 'undefined') {
 			}
 			var row = {};
 			$(tr).children("td").each(function(td_index, td) {
-				var key = table.keys[td_index];
+				var key = table.getKeys()[td_index];
 				if (key != null) $(td).attr("fulltable-field-name", key);
 				var value;
 				if (data == null) {
@@ -206,7 +199,7 @@ if (typeof jQuery === 'undefined') {
 
 		var getBodyFromDom = function() {
 			$(table).find("tbody tr").each(function(tr_index, tr) {
-				table.rows[tr_index] = drawRow(null, tr);
+				table.getRows()[tr_index] = drawRow(null, tr);
 			});
 		};
 		
@@ -278,6 +271,7 @@ if (typeof jQuery === 'undefined') {
 		
 		var showRowForm = function(row) {
 			for (var fieldName in row) {
+				if (!row.hasOwnProperty(fieldName)) continue;
 				if (fieldName.indexOf("__") == 0) continue;
 				var value = row[fieldName];
 				if (value == "") value = null;
@@ -299,6 +293,7 @@ if (typeof jQuery === 'undefined') {
 					});
 					$(input).append($(optionDom));
 					for (var option in fieldData.options) {
+						if (!fieldData.options.hasOwnProperty(option)) continue;
 						option = fieldData.options[option];
 						optionDom = $("<option>", {
 							'text':option.title,
@@ -329,7 +324,7 @@ if (typeof jQuery === 'undefined') {
 			'on':function(eventName, eventHandler) {
 				if (typeof eventName != "string" || typeof eventHandler != "function") return;
 				if (eventName != "on" && methods[eventName] != null) {
-					table.events[eventName] = function() {
+					table.getEvents()[eventName] = function() {
 						console.log("Event fired: " + eventName);
 						eventHandler.apply(this, arguments);
 					};
@@ -345,14 +340,16 @@ if (typeof jQuery === 'undefined') {
 				});
 				var dataKeys = ["fulltable-creating", "fulltable-editing"];
 				for (var dataKey in dataKeys) {
+					if (!dataKeys.hasOwnProperty(dataKey)) continue;
 					$(table).removeData(dataKey);
 					$(table).find("*").removeData(dataKey);
 				}
-				if (typeof table.events.clean == "function") table.events.clean();
+				if (typeof table.getEvents().clean == "function") table.getEvents().clean();
 			},
 			'changeSettings':function(newOptionsPart) {
 				if (typeof newOptionsPart != "object") return this;
 				for (var key in options) {
+					if (!options.hasOwnProperty(key)) continue;
 					if (newOptionsPart[key] == null) continue;
 					if (key == "fields") {
 						var fields = options["fields"]
@@ -365,6 +362,7 @@ if (typeof jQuery === 'undefined') {
 								continue;
 							}
 							for (var key in newField) {
+								if (!newField.hasOwnProperty(key)) continue;
 								fields[newFieldName][key] = newFields[newFieldName][key];
 							}
 						}
@@ -373,7 +371,7 @@ if (typeof jQuery === 'undefined') {
 					options[key] = newOptionsPart[key];
 				}
 				draw();
-				if (typeof table.events.changeSettings == "function") table.events.changeSettings(newOptionsPart, options);
+				if (typeof table.getEvents().changeSettings == "function") table.getEvents().changeSettings(newOptionsPart, options);
 				return this;
 			},
 			'draw':function() {
@@ -462,16 +460,17 @@ if (typeof jQuery === 'undefined') {
 				// Appending of header for edition controls
 				addEditionControl({"__dom":$(table).find("thead tr")}, "head");
 				addSelectionControl({"__dom":$(table).find("thead tr")}, "head");
-				if (typeof table.events.drawHeader == "function") table.events.drawHeader();
+				if (typeof table.getEvents().drawHeader == "function") table.getEvents().drawHeader();
 				return this;
 			},
 			'drawBody':function() {
 				$(table).find("tbody tr").detach();
-				for (var row in table.rows) {
-					row = table.rows[row];
+				for (var row in table.getRows()) {
+					row = table.getRows()[row];
 					if ((row["__filtered"] && !row["__creating"]) || row["__removed"]) continue;
 					row["__invalidOptionRemoved"] = false;
 					for (var fieldName in row) {
+						if (!row.hasOwnProperty(fieldName)) continue;
 						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").empty();
 						if (row["__creating"] || $(row["__dom"]).data("fulltable-editing")) continue;
 						var value = row[fieldName];
@@ -507,20 +506,20 @@ if (typeof jQuery === 'undefined') {
 					}
 					$(table).find("tbody").append(row["__dom"]);
 				}
-				if (typeof table.events.drawBody == "function") table.events.drawBody(table.rows);
+				if (typeof table.getEvents().drawBody == "function") table.getEvents().drawBody(table.getRows());
 				return this;
 			},
 			'filter':function() {
-				for (var row in table.rows) {
-					row = table.rows[row];
+				for (var row in table.getRows()) {
+					row = table.getRows()[row];
 					row["__filtered"] = false;
 					$(table).find("tbody").append($(row["__dom"]));
 				}
 				$(table).find("thead th input.fulltable-filter, thead th select.fulltable-filter").each(function (i, e) {
 					var filtering_value = $(e).val();
 					var fieldName = $(e).parents("th").first().attr("fulltable-field-name");
-					for (var row in table.rows) {
-						row = table.rows[row];
+					for (var row in table.getRows()) {
+						row = table.getRows()[row];
 						var filtered_value = row[fieldName];
 						var filtered = false;
 						if ($(row["__dom"]).data("fulltable-editing")) continue;
@@ -539,12 +538,12 @@ if (typeof jQuery === 'undefined') {
 						}
 					}
 				});
-				if (typeof table.events.filter == "function") table.events.filter();
+				if (typeof table.getEvents().filter == "function") table.getEvents().filter();
 				order();
 				return this;
 			},
 			'order':function(sorting) {
-				var fields = table.sorting;
+				var fields = table.getSorting();
 				if (Array.isArray(sorting)) {
 					sorting = sorting.reverse();
 					for (var sortingItem in sorting) {
@@ -599,15 +598,16 @@ if (typeof jQuery === 'undefined') {
 				};
 				if (!Array.isArray(fields) || fields.length == 0) return this;
 				for (var field in fields) {
+					if (!fields.hasOwnProperty(field)) continue;
 					field = fields[field];
-					table.rows = table.rows.sort(compareFunction(field.name, field.sort));
+					table.setRows(table.getRows().sort(compareFunction(field.name, field.sort)));
 					var head = $(table).find("thead th[fulltable-field-name='" + field.name + "']"); // TODO: Improve saving header in all rows by reference.
 					$(head).removeClass("fulltable-asc").removeClass("fulltable-desc");
 					if (field.sort >= 0) $(head).addClass("fulltable-asc");	
 					else $(head).addClass("fulltable-desc");	
 				}
 				drawBody();
-				if (typeof table.events.order == "function") table.events.order();
+				if (typeof table.getEvents().order == "function") table.getEvents().order();
 				return this;
 			},
 			'validateRow':function(row, writeRow) {
@@ -619,6 +619,7 @@ if (typeof jQuery === 'undefined') {
 				row["__validated_texts"] = texts;
 				row["__validated_values"] = values;
 				for (var fieldName in row) {
+					if (!row.hasOwnProperty(fieldName)) continue;
 					var fieldError = false;
 					if (fieldName.indexOf("__") == 0) continue;
 					var fieldData = options.fields[fieldName] || {};
@@ -668,6 +669,7 @@ if (typeof jQuery === 'undefined') {
 					if (value != null && fieldData.type != null) {
 						var type = null;
 						for (var typeEntry in types) {
+							if (!types.hasOwnProperty(typeEntry)) continue;
 							var typeNames = types[typeEntry];
 							if (typeNames.indexOf(fieldData.type) >= 0) {
 								type = typeEntry;
@@ -712,7 +714,7 @@ if (typeof jQuery === 'undefined') {
 						}
 					}
 					if (value != null && typeof fieldData.validator == "function") {
-						if (!(fieldData.validator(value, row, table.rows, table) === true)) {
+						if (!(fieldData.validator(value, row, table.getRows(), table) === true)) {
 							fieldError = true;
 							if (fieldData.errors != null && fieldData.errors.validator != null) {
 								errors.push(fieldData.errors.validator);
@@ -728,6 +730,7 @@ if (typeof jQuery === 'undefined') {
 					if (writeRow == null) writeRow = false;
 					if (writeRow) {
 						for (var fieldName in values) {
+							if (!values.hasOwnProperty(fieldName)) continue;
 							if ($(td).find("input, select").length > 0) {
 								$(td).find("input, select").val(value);
 							} else {
@@ -742,7 +745,7 @@ if (typeof jQuery === 'undefined') {
 					}
 				}
 				if (error) {
-					if (typeof table.events.error == "function") table.events.error(errors);
+					if (typeof table.getEvents().error == "function") table.getEvents().error(errors);
 				}
 				return !error;
 			},
@@ -751,14 +754,15 @@ if (typeof jQuery === 'undefined') {
 				if ($(table).data("fulltable-creating")) return this;
 				$(table).data("fulltable-creating", true);
 				var row = {};
-				var row_index = table.rows.length;
-				table.rows[row_index] = row;
+				var row_index = table.getRows().length;
+				table.getRows()[row_index] = row;
 				row["__creating"] = true;
 				row["__dom"] = $("<tr/>");
 				row["__filtering"] = false; 
 				row["__invalidOptionRemoved"] = false; 
-				for (var fieldName in table.keys) {
-					fieldName = table.keys[fieldName];
+				for (var fieldName in table.getKeys()) {
+					if (!table.getKeys().hasOwnProperty(fieldName)) continue;
+					fieldName = table.getKeys()[fieldName];
 					var td = $("<td/>", {
 						'fulltable-field-name': fieldName
 					});
@@ -772,7 +776,7 @@ if (typeof jQuery === 'undefined') {
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
 				$(row["__dom"]).addClass("fulltable-creating");
-				if (typeof table.events.addRow == "function") table.events.addRow(row);
+				if (typeof table.getEvents().addRow == "function") table.getEvents().addRow(row);
 				return this;
 			},
 			'editRow':function(row) {
@@ -780,7 +784,7 @@ if (typeof jQuery === 'undefined') {
 				if (typeof row != "object") return this;
 				$(row["__dom"]).data("fulltable-editing", true);
 				showRowForm(row);
-				if (typeof table.events.editRow == "function") table.events.editRow(row);
+				if (typeof table.getEvents().editRow == "function") table.getEvents().editRow(row);
 				if (options.alwaysCreating === true) addRow(); // Here this invocation should not be needed, but it cannot cause problems because method idenpontency.
 				return this;
 			},
@@ -790,6 +794,7 @@ if (typeof jQuery === 'undefined') {
 				row["__removed"] = true;
 				$(row["__dom"]).detach();
 				for (var fieldName in row) {
+					if (!row.hasOwnProperty(fieldName)) continue;
 					if (fieldName.indexOf("__") == 0) continue;
 					var value = row[fieldName];
 					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
@@ -800,7 +805,7 @@ if (typeof jQuery === 'undefined') {
 					});
 					$(td).append($(input));
 				}
-				if (typeof table.events.removeRow == "function") table.events.removeRow(row);
+				if (typeof table.getEvents().removeRow == "function") table.getEvents().removeRow(row);
 				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
@@ -817,13 +822,14 @@ if (typeof jQuery === 'undefined') {
 					row["__creating"] = false;
 				}
 				for (var fieldName in row) {
+					if (!row.hasOwnProperty(fieldName)) continue;
 					if (fieldName.indexOf("__") == 0) continue;
 					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 					$(td).empty();
 					$(td).text(row["__validated_texts"][fieldName]);
 					row[fieldName] = row["__validated_values"][fieldName];
 				}
-				if (typeof table.events.saveRow == "function") table.events.saveRow(row);
+				if (typeof table.getEvents().saveRow == "function") table.getEvents().saveRow(row);
 				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
@@ -839,6 +845,7 @@ if (typeof jQuery === 'undefined') {
 					$(row["__dom"]).detach();
 				} else {
 					for (var fieldName in row) {
+						if (!row.hasOwnProperty(fieldName)) continue;
 						if (fieldName.indexOf("__") == 0) continue;
 						var value = row[fieldName];
 						var text = value;
@@ -860,19 +867,19 @@ if (typeof jQuery === 'undefined') {
 						$(td).text(text);
 					}
 				}
-				if (typeof table.events.discardRow == "function") table.events.discardRow(row);
+				if (typeof table.getEvents().discardRow == "function") table.getEvents().discardRow(row);
 				if (options.alwaysCreating === true) addRow();
 				return this;
 			},
 			'checkRow': function(row) {
 				if (row["__selected"] == null) row["__selected"] = false;
 				row["__selected"] = !row["__selected"]; 
-				if (typeof table.events.checkRow == "function") table.events.checkRow(row);
+				if (typeof table.getEvents().checkRow == "function") table.getEvents().checkRow(row);
 			},
 			'getData':function(selected) {
 				var result = [];
-				for (var row in table.rows) {
-					row = table.rows[row];
+				for (var row in table.getRows()) {
+					row = table.getRows()[row];
 					if (row["__selected"] == null) row["__selected"] = false;
 					if (selected === false && row["__selected"] == true) continue;
 					if (selected === true && row["__selected"] == false) continue;
@@ -881,28 +888,29 @@ if (typeof jQuery === 'undefined') {
 					if (row["__removed"] === true || row["__invalidOptionRemoved"] === true) continue;
 					result.push(resultRow);
 					for (var fieldName in row) {
+						if (!row.hasOwnProperty(fieldName)) continue;
 						if (fieldName.indexOf("__") == 0) continue;
 						var value = row[fieldName];
 						resultRow[fieldName] = value;
 					}
 				}
-				if (typeof table.events.getData == "function") table.events.getData();
+				if (typeof table.getEvents().getData == "function") table.getEvents().getData();
 				return result;
 			},
 			'setData':function(data) {
 				if (!Array.isArray(data)) {
 					return this;
 				}
-				var oldData = table.rows.splice(0, table.rows.length);
+				var oldData = table.getRows().splice(0, table.getRows().length);
 				var newData = data;
 				for (var rowData in data) {
 					rowData = data[rowData];
 					var row = drawRow(rowData, null);
 					if (!validateRow(row)) continue;
-					table.rows.push();
+					table.getRows().push(row);
 				}
 				drawBody();
-				if (typeof table.events.setData == "function") table.events.setData(oldData, newData);
+				if (typeof table.getEvents().setData == "function") table.getEvents().setData(oldData, newData);
 				return this;
 			},
 			'error': function() {

@@ -100,6 +100,9 @@ table.fulltable.fulltable-editable td.fulltable-edition-control a.fulltable-disc
 table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-edit, table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-remove {
 	display:none;
 }
-table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr:not(.fulltable-editing) td.fulltable-edition-control a.fulltable-discard {
+table.fulltable.fulltable-editable tr td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr td.fulltable-edition-control a.fulltable-discard {
 	display:none;
+}
+table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-save, table.fulltable.fulltable-editable tr.fulltable-editing td.fulltable-edition-control a.fulltable-discard {
+	display:inline-block;
 }
