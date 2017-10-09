@@ -1,13 +1,4 @@
 # jquery-fulltable
-Plugin that enables any table to be filtered, ordered, edited, and more, all in one. 
-
-
----
-title: JQuery Full Table
-description: Enables any table to be filtered, ordered, edited, selected, and more, all in one.
----
-
-# jquery-fulltable
 
 This plugin defines a function of JQuery API called FullTable, which enables both initializate and operate any table, rendering, in addition, all the DOMs needed to be controlled by user.
 
