@@ -334,7 +334,6 @@ if (typeof Array.isArray != "function") {
 				if (typeof eventName != "string" || typeof eventHandler != "function") return;
 				if (eventName != "on" && methods[eventName] != null) {
 					table.getEvents()[eventName] = function() {
-						console.log("Event fired: " + eventName);
 						eventHandler.apply(this, arguments);
 					};
 				}
@@ -576,11 +575,11 @@ if (typeof Array.isArray != "function") {
 							for (var option in fieldData.options) {
 								option = fieldData.options[option];
 								if (!foundA && option["value"] == a[field]) {
-									a = option["title"]; 
+									a = option["title"];
 									foundA = true;
 								}
 								if (!foundB && option["value"] == b[field]) {
-									b = option["title"]; 
+									b = option["title"];
 									foundB = true;
 								}
 								if (foundA && foundB) break;
@@ -589,6 +588,8 @@ if (typeof Array.isArray != "function") {
 							a = a[field];
 							b = b[field];
 						}
+						if (a != null) a = a.toUpperCase(); 
+						if (b != null) b = b.toUpperCase(); 
 						if (a == null || b == null) return 0;
 						if (!isNaN(a) && !isNaN(b)) {
 							a = Number(a);

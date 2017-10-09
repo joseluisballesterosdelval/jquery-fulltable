@@ -1,11 +1,11 @@
 @font-face {
-    font-family: 'webfontregular';
+    font-family: 'jquery.fulltable';
     src: url('jquery.fulltable.eot');
     src: url('jquery.fulltable.eot?#iefix') format('embedded-opentype'),
          url('jquery.fulltable.woff2') format('woff2'),
          url('jquery.fulltable.woff') format('woff'),
          url('jquery.fulltable.ttf') format('truetype'),
-         url('jquery.fulltable.svg#webfontregular') format('svg');
+         url('jquery.fulltable.svg#jquery.fulltable') format('svg');
     font-weight: normal;
     font-style: normal;
 }
