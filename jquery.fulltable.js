@@ -129,6 +129,7 @@ if (typeof Array.isArray != "function") {
 		var addSortItem = function(fieldName, fieldSort) {
 			var removing_indexes = [];
 			for (var index in table.getSorting()) {
+				if (!table.getSorting().hasOwnProperty(index)) continue;
 				var sortingItem = table.getSorting()[index];
 				if (sortingItem.name == fieldName) {
 					removing_indexes.push(index);
@@ -136,6 +137,7 @@ if (typeof Array.isArray != "function") {
 			}
 			removing_indexes = removing_indexes.reverse();
 			for (var index in removing_indexes) {
+				if (!removing_indexes.hasOwnProperty(index)) continue;
 				index = removing_indexes[index];
 				table.getSorting().splice(index, 1);
 			}
@@ -187,6 +189,7 @@ if (typeof Array.isArray != "function") {
 					text = "";
 					var found = false;
 					for (var option in fieldData.options) {
+						if (!fieldData.options.hasOwnProperty(option)) continue;
 						option = fieldData.options[option];
 						if (option.value == value) {
 							text = option.title;
@@ -364,6 +367,7 @@ if (typeof Array.isArray != "function") {
 						var newFields = newOptionsPart["fields"];
 						if (typeof newFields != "object") continue;
 						for (var newFieldName in newFields) {
+							if (!newFields.hasOwnProperty(newFieldName)) continue;
 							var newField = newFields[newFieldName];
 							if (fields[newFieldName] == null) {
 								fields[newFieldName] = newField;
@@ -436,6 +440,7 @@ if (typeof Array.isArray != "function") {
 								$(filterFieldElement).append($(optionDom));
 								// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 								for (var option in fieldData.options) {
+									if (!fieldData.options.hasOwnProperty(option)) continue;
 									option = fieldData.options[option];
 									optionDom = $("<option>", {
 										'text':option.title,
@@ -474,6 +479,7 @@ if (typeof Array.isArray != "function") {
 			'drawBody':function() {
 				$(table).find("tbody tr").detach();
 				for (var row in table.getRows()) {
+					if (!table.getRows().hasOwnProperty(row)) continue;
 					row = table.getRows()[row];
 					if ((row["__filtered"] && !row["__creating"]) || row["__removed"]) continue;
 					row["__invalidOptionRemoved"] = false;
@@ -492,6 +498,7 @@ if (typeof Array.isArray != "function") {
 								if (!fieldData.mandatory) found = true;
 							} else {
 								for (var option in fieldData.options) {
+									if (!fieldData.options.hasOwnProperty(option)) continue;
 									option = fieldData.options[option];
 									if (option.value == value) {
 										found = true;
@@ -519,6 +526,7 @@ if (typeof Array.isArray != "function") {
 			},
 			'filter':function() {
 				for (var row in table.getRows()) {
+					if (!table.getRows().hasOwnProperty(row)) continue;
 					row = table.getRows()[row];
 					if (row["__removed"] == true) {
 						$(row["__dom"]).remove();
@@ -531,6 +539,7 @@ if (typeof Array.isArray != "function") {
 					var filtering_value = $(e).val();
 					var fieldName = $(e).parents("th").first().attr("fulltable-field-name");
 					for (var row in table.getRows()) {
+						if (!table.getRows().hasOwnProperty(row)) continue;
 						row = table.getRows()[row];
 						var filtered_value = row[fieldName];
 						var filtered = false;
@@ -559,6 +568,7 @@ if (typeof Array.isArray != "function") {
 				if (Array.isArray(sorting)) {
 					sorting = sorting.reverse();
 					for (var sortingItem in sorting) {
+						if (!sorting.hasOwnProperty(sortingItem)) continue;
 						sortingItem = sorting[sortingItem];
 						if (sortingItem.name != null && typeof(sortingItem.sort) == "number") {
 							addSortItem(sortingItem.name, sortingItem.sort);
@@ -577,6 +587,7 @@ if (typeof Array.isArray != "function") {
 						if (fieldData.options != null) {
 							var foundA = false, foundB = false;
 							for (var option in fieldData.options) {
+								if (!fieldData.options.hasOwnProperty(option)) continue;
 								option = fieldData.options[option];
 								if (!foundA && option["value"] == a[field]) {
 									a = option["title"];
@@ -652,6 +663,7 @@ if (typeof Array.isArray != "function") {
 					if (fieldData.options != null) {
 						var found = false;
 						for (var option in fieldData.options) {
+							if (!fieldData.options.hasOwnProperty(option)) continue;
 							option = fieldData.options[option];
 							if (option["value"] == value) {
 								text = option["title"]; 
@@ -869,6 +881,7 @@ if (typeof Array.isArray != "function") {
 						if (fieldData.options != null) {
 							text = "";
 							for (var option in fieldData.options) {
+								if (!fieldData.options.hasOwnProperty(option)) continue;
 								option = fieldData.options[option];
 								if (option["value"] == value) {
 									text = option["title"]; 
@@ -893,6 +906,7 @@ if (typeof Array.isArray != "function") {
 			'getData':function(selected) {
 				var result = [];
 				for (var row in table.getRows()) {
+					if (!table.getRows().hasOwnProperty(row)) continue;
 					row = table.getRows()[row];
 					if (row["__selected"] == null) row["__selected"] = false;
 					if (selected === false && row["__selected"] == true) continue;
@@ -918,6 +932,7 @@ if (typeof Array.isArray != "function") {
 				var oldData = table.getRows().splice(0, table.getRows().length);
 				var newData = data;
 				for (var rowData in data) {
+					if (!data.hasOwnProperty(rowData)) continue;
 					rowData = data[rowData];
 					var row = drawRow(rowData, null);
 					if (!validateRow(row)) continue;
