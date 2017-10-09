@@ -520,6 +520,10 @@ if (typeof Array.isArray != "function") {
 			'filter':function() {
 				for (var row in table.getRows()) {
 					row = table.getRows()[row];
+					if (row["__removed"] == true) {
+						$(row["__dom"]).remove();
+						continue;
+					}
 					row["__filtered"] = false;
 					$(table).find("tbody").append($(row["__dom"]));
 				}
@@ -588,8 +592,8 @@ if (typeof Array.isArray != "function") {
 							a = a[field];
 							b = b[field];
 						}
-						if (a != null) a = a.toUpperCase(); 
-						if (b != null) b = b.toUpperCase(); 
+						if (typeof a == "string") a = a.toUpperCase(); 
+						if (typeof b == "string") b = b.toUpperCase(); 
 						if (a == null || b == null) return 0;
 						if (!isNaN(a) && !isNaN(b)) {
 							a = Number(a);
