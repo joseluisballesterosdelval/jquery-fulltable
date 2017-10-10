@@ -12,7 +12,10 @@ if (typeof Array.isArray != "function") {
 	Array.isArray = function(obj) {
 		if (typeof obj != "object") return false;
 		if (typeof obj.length == "undefined") return false;
-		if (obj.hasOwnProperty("length")) return false;
+		for (var i in obj) { 
+			if (!obj.hasOwnProperty(i)) continue;
+			if (typeof i != "number") return false;
+		}
 		return true; 
 	};
 }
