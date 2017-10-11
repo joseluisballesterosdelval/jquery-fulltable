@@ -235,22 +235,32 @@ if (typeof Array.isArray != "function") {
 					'class':"fulltable-edition-control"
 				});
 				edition_control.append($("<a/>", {
-					'class':"fulltable-edit"
+					'class':"fulltable-edit",
+					'text':"E"
 				}).click(function() {
 					editRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-remove"
+					'class':"fulltable-remove",
+					'text':"F"
 				}).click(function() {
 					removeRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-save"
+					'class':"fulltable-save",
+					'text':"G"
 				}).click(function() {
 					saveRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-discard"
+					'class':"fulltable-create",
+					'text':"I"
+				}).click(function() {
+					saveRow(row);
+				}));
+				edition_control.append($("<a/>", {
+					'class':"fulltable-discard",
+					'text':"H"
 				}).click(function() {
 					discardRow(row);
 				}));
@@ -276,6 +286,7 @@ if (typeof Array.isArray != "function") {
 				});
 				selection_control.append($("<input/>", {
 					'type':"checkbox",
+					'class':"checkbox",
 					'value':row["__selected"]
 				}).change(function() {
 					checkRow(row);
@@ -416,7 +427,13 @@ if (typeof Array.isArray != "function") {
 						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.orderable == null || fieldData.orderable == true) {
-							var sortElement = $("<a/>").addClass("fulltable-sort");
+							var sortElement = $("<a/>").addClass("fulltable-sort").addClass("fulltable-sort-asc").text("A");
+							$(sortElement).click(function(event) {
+								apply_order(true);
+								order();
+							});
+							$(th).append(sortElement);
+							var sortElement = $("<a/>").addClass("fulltable-sort").addClass("fulltable-sort-desc").text("C");
 							$(sortElement).click(function(event) {
 								apply_order(true);
 								order();
