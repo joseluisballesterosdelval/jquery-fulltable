@@ -24,8 +24,8 @@ if (typeof Array.isArray != "function") {
     'use strict';
 
     $.fn.FullTable = function() {
-        
-		if (!this.is('table')) {
+    	
+    	if (!this.is('table')) {
             return this;
         }
 				
@@ -180,7 +180,7 @@ if (typeof Array.isArray != "function") {
 				if (key != null) $(td).attr("fulltable-field-name", key);
 				var value;
 				if (data == null) {
-					value = $(td).text();
+					value = $(td).html();
 				} else {
 					value = data[key];
 				}
@@ -203,7 +203,7 @@ if (typeof Array.isArray != "function") {
 					if (!found) value = null;
 				}
 				row[key] = value;
-				$(td).text(text);
+				$(td).html(text);
 			});
 			row["__dom"] = $(tr);
 			row["__filtered"] = false;
@@ -235,22 +235,32 @@ if (typeof Array.isArray != "function") {
 					'class':"fulltable-edition-control"
 				});
 				edition_control.append($("<a/>", {
-					'class':"fulltable-edit"
+					'class':"fulltable-edit",
+					'text':"E"
 				}).click(function() {
 					editRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-remove"
+					'class':"fulltable-remove",
+					'text':"F"
 				}).click(function() {
 					removeRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-save"
+					'class':"fulltable-save",
+					'text':"G"
 				}).click(function() {
 					saveRow(row);
 				}));
 				edition_control.append($("<a/>", {
-					'class':"fulltable-discard"
+					'class':"fulltable-create",
+					'text':"I"
+				}).click(function() {
+					saveRow(row);
+				}));
+				edition_control.append($("<a/>", {
+					'class':"fulltable-discard",
+					'text':"H"
 				}).click(function() {
 					discardRow(row);
 				}));
@@ -276,6 +286,7 @@ if (typeof Array.isArray != "function") {
 				});
 				selection_control.append($("<input/>", {
 					'type':"checkbox",
+					'class':"checkbox",
 					'value':row["__selected"]
 				}).change(function() {
 					checkRow(row);
@@ -358,6 +369,7 @@ if (typeof Array.isArray != "function") {
 					$(table).removeData(dataKey);
 					$(table).find("*").removeData(dataKey);
 				}
+				$(table).removeData('fulltable');
 				if (typeof table.getEvents().clean == "function") table.getEvents().clean();
 			},
 			'changeSettings':function(newOptionsPart) {
@@ -416,7 +428,13 @@ if (typeof Array.isArray != "function") {
 						var fieldData = options.fields[fieldName];
 						if (fieldData == null) fieldData = {};
 						if (fieldData.orderable == null || fieldData.orderable == true) {
-							var sortElement = $("<a/>").addClass("fulltable-sort");
+							var sortElement = $("<a/>").addClass("fulltable-sort").addClass("fulltable-sort-asc").html("A");
+							$(sortElement).click(function(event) {
+								apply_order(true);
+								order();
+							});
+							$(th).append(sortElement);
+							var sortElement = $("<a/>").addClass("fulltable-sort").addClass("fulltable-sort-desc").html("C");
 							$(sortElement).click(function(event) {
 								apply_order(true);
 								order();
@@ -473,10 +491,12 @@ if (typeof Array.isArray != "function") {
 					filter();
 				});
 		
+				var pseudoRow = {"__dom":$(table).find("thead tr")};
+				
 				// Appending of header for edition controls
-				addEditionControl({"__dom":$(table).find("thead tr")}, "head");
-				addSelectionControl({"__dom":$(table).find("thead tr")}, "head");
-				if (typeof table.getEvents().drawHeader == "function") table.getEvents().drawHeader();
+				addEditionControl(pseudoRow, "head");
+				addSelectionControl(pseudoRow, "head");
+				if (typeof table.getEvents().drawHeader == "function") table.getEvents().drawHeader(pseudoRow);
 				return this;
 			},
 			'drawBody':function() {
@@ -515,7 +535,7 @@ if (typeof Array.isArray != "function") {
 							row["__invalidOptionRemoved"] = row["__invalidOptionRemoved"] || false; // If options has been removed from field settings, this restriction must be also removed.
 						}
 						if (value == null) text = "";
-						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").text(text);
+						$(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']").html(text);
 						if (row["__invalidOptionRemoved"]) break;
 					}
 					if (row["__invalidOptionRemoved"] && !row["__creating"]) continue;
@@ -660,7 +680,7 @@ if (typeof Array.isArray != "function") {
 					} else if ($(td).find("select").length > 0) {
 						value = $(td).find("select").val();
 					} else {
-						text = $(td).text();
+						text = $(td).html();
 					}
 					// TODO: Here must be validation of input type: select, checkbox, if (fieldData.options == "boolean")
 					if (fieldData.options != null) {
@@ -764,7 +784,7 @@ if (typeof Array.isArray != "function") {
 								$(td).find("input, select").val(value);
 							} else {
 								$(td).empty();
-								$(td).text(text);
+								$(td).html(text);
 							}
 						}
 					}
@@ -855,7 +875,7 @@ if (typeof Array.isArray != "function") {
 					if (fieldName.indexOf("__") == 0) continue;
 					var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 					$(td).empty();
-					$(td).text(row["__validated_texts"][fieldName]);
+					$(td).html(row["__validated_texts"][fieldName]);
 					row[fieldName] = row["__validated_values"][fieldName];
 				}
 				if (typeof table.getEvents().saveRow == "function") table.getEvents().saveRow(row);
@@ -894,7 +914,7 @@ if (typeof Array.isArray != "function") {
 						}
 						var td = $(row["__dom"]).find("td[fulltable-field-name='" + fieldName + "']");
 						$(td).empty();
-						$(td).text(text);
+						$(td).html(text);
 					}
 				}
 				if (typeof table.getEvents().discardRow == "function") table.getEvents().discardRow(row);
@@ -979,6 +999,7 @@ if (typeof Array.isArray != "function") {
 		var methodArguments = null;
 		
 		if (typeof arguments[0] == "string") {
+			if ($(table).data('fulltable') != true) return;
 			if (options == null) return this;
 			method = methods[arguments[0]];
 			methodArguments = Array.prototype.slice.call(arguments, 1);
@@ -996,6 +1017,7 @@ if (typeof Array.isArray != "function") {
 			$(table).data('options', options);
 		}
 
+		$(table).data('fulltable', true);
 		$(table).addClass("fulltable");
 		if (options.editable) {
 			$(table).addClass("fulltable-editable");
